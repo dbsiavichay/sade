@@ -148,7 +148,7 @@ public class UsuarioController {
         Usuario _usuario = null;
         try {
             if (!validaCedula(this.usuarioActual.getCedula())) {
-                Mensajeria.addErrorMessage(String.format("La cédula %s no es correcta.", this.usuarioActual.getCedula()));
+                Mensajeria.addErrorMessage(String.format("La cÃ©dula %s no es correcta.", this.usuarioActual.getCedula()));
                 this.usuarioActual.setCedula(null);
                 return;
             }
@@ -187,7 +187,7 @@ public class UsuarioController {
         Usuario _usuario = null;
         try {
             if (!validaCedula(this.usuarioActual.getCedula())) {
-                Mensajeria.addErrorMessage(String.format("La cédula %s no es correcta.", this.usuarioActual.getCedula()));
+                Mensajeria.addErrorMessage(String.format("La cÃ©dula %s no es correcta.", this.usuarioActual.getCedula()));
                 this.usuarioActual.setCedula(null);
                 return;
             }
@@ -218,7 +218,7 @@ public class UsuarioController {
         Usuario _usuario = null;
         try {
             if (!validaCedula(this.usuarioActual.getCedula())) {
-                Mensajeria.addErrorMessage(String.format("La cédula %s no es correcta.", this.usuarioActual.getCedula()));
+                Mensajeria.addErrorMessage(String.format("La cÃ©dula %s no es correcta.", this.usuarioActual.getCedula()));
                 this.usuarioActual.setCedula(null);
                 return;
             }

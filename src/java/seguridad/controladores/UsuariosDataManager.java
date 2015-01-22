@@ -59,7 +59,7 @@ public class UsuariosDataManager implements Serializable {
     }
     //</editor-fold>
 
-    //<editor-fold defaultstate="collapsed" desc="MÃ©todos Set y Get">
+    //<editor-fold defaultstate="collapsed" desc="Metodos Set y Get">
     public Usuario getUsuarioSesion() {
         return usuarioSesion;
     }
@@ -212,12 +212,12 @@ public class UsuariosDataManager implements Serializable {
             }
 
             if (this.usuarioSesion == null) {
-                Mensajeria.addErrorMessage("Usuario o contraseña incorrectos.");
+                Mensajeria.addErrorMessage("Usuario o contrasenia incorrectos.");
                 this.usuarioSesion = new Usuario();
                 return null;
             }
             if (!this.usuarioSesion.getActivo()) {
-                Mensajeria.addErrorMessage("Este usuario está inactivo.");
+                Mensajeria.addErrorMessage("Este usuario se encuentra inactivo.");
                 return null;
             }
 

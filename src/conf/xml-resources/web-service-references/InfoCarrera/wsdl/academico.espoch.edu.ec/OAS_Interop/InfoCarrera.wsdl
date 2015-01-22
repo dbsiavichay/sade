@@ -3834,7 +3834,7 @@
     </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="InfoCarrera">
-    <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Este servicio provee información sobre una carrera</documentation>
+    <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Este servicio provee informacion sobre una carrera</documentation>
     <wsdl:port name="InfoCarreraSoap" binding="tns:InfoCarreraSoap">
       <soap:address location="http://academico.espoch.edu.ec/OAS_Interop/InfoCarrera.asmx" />
     </wsdl:port>

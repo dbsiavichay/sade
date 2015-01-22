@@ -665,7 +665,7 @@
     </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="InfoGeneral">
-    <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Este servicio provee información general de la ESPOCH</documentation>
+    <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Este servicio provee informacion general de la ESPOCH</documentation>
     <wsdl:port name="InfoGeneralSoap" binding="tns:InfoGeneralSoap">
       <soap:address location="http://academico.espoch.edu.ec/OAS_Interop/InfoGeneral.asmx" />
     </wsdl:port>
