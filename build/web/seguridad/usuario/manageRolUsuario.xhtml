@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui" 
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+
+        <ui:define name="tituloPagina">
+            Roles de usuario
+        </ui:define>
+
+        <ui:define name="listados">            
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+                <p:growl id="mensajes"/>
+                <p:tabView id="tabInfo" >
+                    <p:messages id="msgListados"/>
+                    <p:tab id="pnlListado" title="Roles de Usuario">                           
+                        <h:panelGrid columns="1" columnClasses="columna_centro">
+                            <p:fieldset id="flsUsuario" legend="Usuario seleccionado" style="margin-top:20px">
+                                <h:outputText value="#{competenciaController.usuarioSeleccionado.nombreCompleto}"  
+                                              class="label_negrilla" style="font-size:20px;" /> 
+                            </p:fieldset>
+
+                            <h:panelGrid id="pnlRoles" columns="2" columnClasses="columna_centro,columna_centro" >                                                                
+                                <p:fieldset id="flsRoles" legend="Roles disponibles" rendered="#{competenciaController.usuarioSeleccionado!=null}"> 
+                                    <p:dataTable id="tblRoles" var="rol"  value="#{competenciaController.rolesDisponibles}" paginator="#{competenciaController.rolesDisponibles.size()>5}" 
+                                                 rows="5" emptyMessage="#{seguridad.sinDatos}" >
+                                        <p:column style="width:20px">  
+                                            <h:outputText id="dragIcon"  
+                                                          styleClass="ui-icon ui-icon-arrow-4" />  
+                                            <p:draggable for="dragIcon" revert="true"/>
+                                        </p:column>                          
+                                        <p:column  headerText="CÓDIGO">
+                                            #{rol.codigo}
+                                        </p:column>
+                                        <p:column headerText="DESCRIPCION">
+                                            #{rol.descripcion}
+                                        </p:column>                                                                                
+                                    </p:dataTable>
+                                </p:fieldset>
+
+                                <p:fieldset id="flsRolesSeleccionados" legend="Roles seleccionados" style="margin-top:20px" rendered="#{competenciaController.usuarioSeleccionado!=null}">  
+                                    <p:outputPanel id="dropArea">  
+                                        <h:outputText value="!!!Arrastre aquí!!!" rendered="#{empty competenciaController.rolesSelecionados}"  
+                                                      style="font-size:24px;" />  
+
+                                        <p:dataTable var="rol" value="#{competenciaController.rolesSelecionados}" paginator="#{competenciaController.rolesDisponibles.size()>5}" 
+                                                     rows="5" rendered="#{not empty competenciaController.rolesSelecionados}">  
+
+                                            <p:column headerText="CÓDIGO">
+                                                #{rol.codigo}
+                                            </p:column>
+                                            <p:column headerText="DESCRIPCION">
+                                                #{rol.descripcion}
+                                            </p:column>   
+
+                                            <p:column style="width:32px">  
+                                                <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar"
+                                                                 action="#{competenciaController.eliminarRol()}" update=":frmListado:tabInfo:pnlRoles" rendered="#{true}">
+                                                    <f:setPropertyActionListener value="#{rol}" target="#{competenciaController.rolSeleccionado}"/>
+                                                </p:commandButton>  
+                                            </p:column>  
+                                        </p:dataTable>  
+                                    </p:outputPanel>  
+                                </p:fieldset>  
+
+                                <p:droppable for="flsRolesSeleccionados" tolerance="touch" activeStyleClass="ui-state-highlight" datasource="tblRoles">  
+                                    <p:ajax listener="#{competenciaController.agregarRol}" update=":frmListado:tabInfo:pnlRoles" />  
+                                </p:droppable> 
+                            </h:panelGrid>
+                        </h:panelGrid>
+                        <p:commandButton value="Guardar" icon="ui-icon-disk" rendered="#{competenciaController.usuarioSeleccionado!=nul}"
+                                         action="#{competenciaController.guardarRolesUsuario()}" process="@this" ajax="false"/>
+                    </p:tab>
+                </p:tabView>
+            </h:form>
+        </ui:define>
+
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+        </ui:define>
+
+    </ui:composition>
+</html>

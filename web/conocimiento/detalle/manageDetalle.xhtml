@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            Administración de Detalles
+        </ui:define>
+        <ui:define name="listados">
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+                <p:panel id="pnlListado" header="Administración de detalles">
+                    <p:messages id="msgListados"/>
+
+                    <p:commandButton id="btnNuevo" value="Nuevo" icon="ui-icon-circle-plus"  title="Nuevo" 
+                                     actionListener="#{detalleController.preparaNuevo()}"  oncomplete="dlgDialog.show()" 
+                                     rendered="#{usuariosDataManager.funcionActual.agregar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" />
+                    <p:separator id="separator"/> 
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Reporte:" for="cboReporte" styleClass="label_negrilla"/>
+                        <p:selectOneMenu id="cboProceso" value="#{detalleController.reporteSeleccionado}" filter="true" filterMatchMode="contains">                            
+                            <f:selectItems value="#{reporteController.reportes}" var="reporte" itemLabel="#{reporte.proceso.codigo} - #{reporte.docente.cedula} - #{reporte.docente.nombreCompleto}" itemValue="#{reporte.id}"/>                            
+                        </p:selectOneMenu>
+                        <p:commandButton id="btnActualizar" icon="ui-icon-refresh" action="#{detalleController.cambiarListaDetalles()}" update=":frmListado:pnlListado"/>
+                    </h:panelGrid>
+                    <p:dataTable id="tblDetalles" var="detalle"  value="#{detalleController.detalles}" filteredValue="#{detalleController.detallesFiltro}" 
+                                 paginator="#{detalleController.detalles.size()>10}" rows="10" emptyMessage="#{mensajes.sinDatos}" >                            
+                        <p:column sortBy="#{detalle.nombreCarrera} - #{detalle.nombreMateria}" headerText="MATERIA"  filterBy="#{detalle.nombreCarrera} - #{detalle.nombreMateria}"  filterMatchMode="contains">
+                            #{detalle.nombreCarrera} - #{detalle.nombreMateria}
+                        </p:column>
+                        <p:column headerText="VALOR" sortBy="#{detalle.valor}">
+                            #{detalle.valor}
+                        </p:column>
+
+                        <p:column>
+                            <p:commandButton id="btnVer" icon="ui-icon-search" title="Ver" oncomplete="dlgDialog.show()" 
+                                             action="#{detalleController.preparaVer()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" >
+                                <f:setPropertyActionListener value="#{detalle}" target="#{detalleController.detalleActual}"/>                                    
+                            </p:commandButton>
+                            <p:commandButton id="btnEditar" icon="ui-icon-pencil"  title="Editar" oncomplete="dlgDialog.show()"
+                                             action="#{detalleController.preparaEditar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes"
+                                             rendered="#{usuariosDataManager.funcionActual.editar}" >
+                                <f:setPropertyActionListener value="#{detalle}" target="#{detalleController.detalleActual}"/>
+                            </p:commandButton>
+                            <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar" oncomplete="dlgPregunta.show()"
+                                             update=":frmDialogos:pnlDatos" rendered="#{usuariosDataManager.funcionActual.eliminar}">
+                                <f:setPropertyActionListener value="#{detalle}" target="#{detalleController.detalleActual}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>                    
+                </p:panel>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos">
+                <p:dialog header="Datos de Detalle" widgetVar="dlgDialog" modal="true" resizable="false"
+                          draggable="true" position="center" width="700">
+                    <p:growl id="mensajes"/>
+                    <h:panelGrid id="pnlDatos" columns="3" columnClasses="columna_derecha,columna_izquierda" >
+                        <h:outputLabel value="Reporte" for="cboReporte" class="label_negrilla"/>
+                        <p:selectOneMenu id="cboReporte" value="#{detalleController.reporteSeleccionado}" required="true" requiredMessage="Este campo es obligatorio."
+                                         disabled="#{not detalleController.ingresaDatos}" filter="true" filterMatchMode="contains">  
+                            <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                            <f:selectItems value="#{reporteController.reportes}" var="reporte" itemLabel="#{reporte.proceso.codigo} - #{reporte.docente.cedula} - #{reporte.docente.nombreCompleto}" itemValue="#{reporte.id}"/>                            
+                        </p:selectOneMenu>
+                        <p:message for="cboReporte" />
+                        
+                        <h:outputLabel value="Carrera" for="cboCarrera" class="label_negrilla" />
+                        <p:selectOneMenu  id="cboCarrera" value="#{detalleController.carreraSeleccionada}" required="true"
+                                          requiredMessage="Este campo es obligatorio." disabled="#{not detalleController.ingresaDatos}">
+                            <f:selectItem itemLabel="Seleccionar" itemValue="" />  
+                            <f:selectItems value="#{detalleController.carreras}" var="carrera" itemLabel="#{carrera.nombre}" itemValue="#{carrera.codigo}"/>
+                            <p:ajax listener="#{detalleController.cambiarListaMaterias()}" update=":frmDialogos:mensajes, cboMateria"/>
+                        </p:selectOneMenu>
+                        <p:message for="cboCarrera" />
+
+                        <h:outputLabel value="Materia" for="cboMateria" class="label_negrilla" />
+                        <p:selectOneMenu  id="cboMateria" value="#{detalleController.materiaSeleccionada}" required="true" filter="true" filterMatchMode="contains"
+                                          requiredMessage="Este campo es obligatorio." disabled="#{not detalleController.ingresaDatos}">
+                            <f:selectItem itemLabel="Seleccionar" itemValue="" />  
+                            <f:selectItems value="#{detalleController.materias}" var="materia" itemLabel="#{materia.nombreMateria}" itemValue="#{materia.codigoMateria}"/>
+                        </p:selectOneMenu>
+                        <p:message for="cboMateria" />
+
+                        <h:outputLabel value="Valor" for="txtValor" class="label_negrilla"/>
+                        <p:inputText id="txtValor" value="#{detalleController.detalleActual.valor}" disabled="#{not detalleController.ingresaDatos}" 
+                                     size="25" required="true" requiredMessage="Este campo es obligatorio" />
+                        <p:message for="txtValor" />
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Guardar"  id="btnGuardar" icon="ui-icon-circle-check" 
+                                             rendered="#{detalleController.nuevo and detalleController.ingresaDatos}" title="Guardar" 
+                                             action="#{detalleController.guardarDetalle()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"/> 
+                            <p:commandButton value="Guardar"  id="btnActualizar" icon="ui-icon-pencil" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"
+                                             rendered="#{detalleController.editar and (detalleController.ingresaDatos) }" title="Actualizar"    
+                                             actionListener="#{detalleController.editarDetalle()}" /> 
+                            <p:commandButton value="Cerrar" icon="ui-icon-circle-close" onclick="dlgDialog.hide()" process="@this"/>
+                        </f:facet>
+                    </h:panelGrid>
+                </p:dialog>
+                <p:dialog header="Pegrunta" widgetVar="dlgPregunta" modal="true" resizable="false"
+                          draggable="false" position="center">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="¿Esta seguro que desea eliminar este registro.?" class="label_negrilla"/>
+                        <h:outputText value="* Recuerde que este registro puede estar enlazada con algunas funciones del sistema."/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="SI" icon="ui-icon-circle-check" actionListener="#{detalleController.eliminarDetalle()}"
+                                             update=":frmListado:pnlListado,:frmDialogos:mensajes" process="@this"/>
+                            <p:commandButton value="NO" icon="ui-icon-circle-close" onclick="dlgPregunta.hide()" process="@this"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+
+    </ui:composition>
+</html>

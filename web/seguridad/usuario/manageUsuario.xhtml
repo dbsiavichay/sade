@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            Administración de Usuarios
+        </ui:define>
+        <ui:define name="listados">
+
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+                <p:panel id="pnlListado" header="Administración de roles">
+                    <p:messages id="msgListados"/>
+                    <p:commandButton id="btnNuevo" value="Nuevo" icon="ui-icon-circle-plus"  title="Nuevo" 
+                                     actionListener="#{usuarioController.preparaNuevo()}"  oncomplete="dlgDialog.show()" 
+                                     rendered="#{usuariosDataManager.funcionActual.agregar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" />
+                    <p:separator id="separator"/> 
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Roles:" for="cboRoles" class="label_negrilla"/>
+                        <p:selectOneMenu id="cboRoles" value="#{usuarioController.rolSeleccionado}">
+                            <f:selectItem itemLabel="Todos" itemValue=""/>
+                            <f:selectItems value="#{rolController.roles}" var="rol" itemLabel="#{rol.nombre}" itemValue="#{rol.id}"/>
+                        </p:selectOneMenu>
+                        <p:commandButton id="btnActualizar" icon="ui-icon-refresh" action="#{usuarioController.cambiarLista()}" update=":frmListado:pnlListado"/>
+                    </h:panelGrid>
+                    <p:dataTable id="tblUsuarios" var="usuario"  value="#{usuarioController.usuarios}" filteredValue="#{usuarioController.usuariosFiltro}" 
+                                 paginator="#{usuarioController.usuarios.size()>10}" rows="10" emptyMessage="#{mensajes.sinDatos}" >   
+
+                        <p:column sortBy="#{usuario.cedula}" headerText="CEDULA"  filterBy="#{usuario.cedula}"  filterMatchMode="contains">
+                            #{usuario.cedula}
+                        </p:column>
+
+                        <p:column sortBy="#{usuario.nombres}" headerText="NOMBRES"  filterBy="#{usuario.nombres}"  filterMatchMode="contains">
+                            #{usuario.nombres}
+                        </p:column>
+
+                        <p:column sortBy="#{usuario.apellidos}" headerText="APELLIDOS"  filterBy="#{usuario.apellidos}"  filterMatchMode="contains">
+                            #{usuario.apellidos}
+                        </p:column>
+
+                        <p:column headerText="ACTIVO">                                
+                            #{usuario.activo?"SI":"NO"}
+                        </p:column>                            
+                        <p:column>
+                            <p:commandButton id="btnVer" icon="ui-icon-search" title="Ver" oncomplete="dlgDialog.show()" 
+                                             action="#{usuarioController.preparaVer()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" >
+                                <f:setPropertyActionListener value="#{usuario}" target="#{usuarioController.usuarioActual}"/>                                    
+                            </p:commandButton>
+                            <p:commandButton id="btnEditar" icon="ui-icon-pencil"  title="Editar" oncomplete="dlgDialog.show()"
+                                             action="#{usuarioController.preparaEditar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes"
+                                             rendered="#{usuariosDataManager.funcionActual.editar}" >
+                                <f:setPropertyActionListener value="#{usuario}" target="#{usuarioController.usuarioActual}"/>
+
+                            </p:commandButton>
+                            <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar" oncomplete="dlgPregunta.show()"
+                                             update=":frmDialogos:pnlDatos" rendered="#{usuariosDataManager.funcionActual.eliminar}">
+                                <f:setPropertyActionListener value="#{usuario}" target="#{usuarioController.usuarioActual}"/>
+                            </p:commandButton>
+                            <p:commandButton id="btnPerfiles" icon="ui-icon-gear"  title="Configurar competencias" ajax="false"
+                                             action="#{usuarioController.irACompetencias}" process="@this">
+                                <f:param name="usuario" value="#{usuario.id}"/>
+                            </p:commandButton>
+                        </p:column>                       
+                    </p:dataTable>                    
+                </p:panel>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos">
+                <p:dialog header="Datos de Rol" widgetVar="dlgDialog" modal="true" resizable="false"
+                          draggable="true" position="center" width="700">
+                    <p:growl id="mensajes"/>
+                    <h:panelGrid id="pnlDatos" columns="3" columnClasses="columna_derecha,columna_izquierda" >
+
+                        <h:outputLabel value="Cédula" for="txtCedula" class="label_negrilla"/>
+                        <p:inputText id="txtCedula" value="#{usuarioController.usuarioActual.cedula}" title="Cédula del usuario" 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="25" disabled="#{not usuarioController.ingresaDatos}">                            
+                        </p:inputText>
+                        <p:message for="txtCedula" />
+
+                        <h:outputLabel value="Contraseña" for="txtContrasena" class="label_negrilla"/>
+                        <p:password id="txtContrasena" value="#{usuarioController.usuarioActual.contrasena}" title="Contraseña" feedback="true"
+                                    required="true" requiredMessage="Este campo es obligatorio" size="25" disabled="#{not usuarioController.ingresaDatos}"/>
+                        <p:message for="txtContrasena" />
+
+                        <h:outputLabel value="Nombres" for="txtNombres" class="label_negrilla"/>
+                        <p:inputText id="txtNombres" value="#{usuarioController.usuarioActual.nombres}" title="Nombres" 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="50" disabled="#{not usuarioController.ingresaDatos}"/>
+                        <p:message for="txtNombres" />
+
+                        <h:outputLabel value="Apellidos" for="txtApellidos" class="label_negrilla"/>
+                        <p:inputText id="txtApellidos" value="#{usuarioController.usuarioActual.apellidos}" title="Apellidos" 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="50" disabled="#{not usuarioController.ingresaDatos}"/>
+                        <p:message for="txtApellidos" />
+
+                        <h:outputLabel value="Telefono fijo" for="txtTelefonoFijo" class="label_negrilla"/>
+                        <p:inputText id="txtTelefonoFijo" value="#{usuarioController.usuarioActual.telefonoFijo}" title="Telefono fijo" 
+                                     size="25" disabled="#{not usuarioController.ingresaDatos}"/>
+                        <p:message for="txtTelefonoFijo" />
+
+                        <h:outputLabel value="Telefono celular" for="txtTelefonoCelular" class="label_negrilla"/>
+                        <p:inputText id="txtTelefonoCelular" value="#{usuarioController.usuarioActual.telefonoCelular}" title="Telefono celular" 
+                                     size="25" disabled="#{not usuarioController.ingresaDatos}"/>
+                        <p:message for="txtTelefonoCelular" />
+
+                        <h:outputLabel value="Email" for="txtEmail" class="label_negrilla"/>
+                        <p:inputText id="txtEmail" value="#{usuarioController.usuarioActual.email}" title="Ej: nombre@ejemplo.com" 
+                                     size="50" disabled="#{not usuarioController.ingresaDatos}"/>
+                        <p:message for="txtEmail" />
+
+                        <h:outputLabel value="Activo" for="chkActivo" class="label_negrilla"/>
+                        <p:selectBooleanCheckbox id="chkActivo" value="#{usuarioController.usuarioActual.activo}" 
+                                                 disabled="#{not usuarioController.ingresaDatos}"/>
+                        <p:message for="chkActivo" />                                           
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Guardar"  id="btnGuardar" icon="ui-icon-circle-check" 
+                                             rendered="#{usuarioController.nuevo and usuarioController.ingresaDatos}" title="Guardar" 
+                                             action="#{usuarioController.guardarUsuario()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"/> 
+                            <p:commandButton value="Guardar"  id="btnActualizar" icon="ui-icon-pencil" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"
+                                             rendered="#{usuarioController.editar and (usuarioController.ingresaDatos) }" title="Actualizar"    
+                                             actionListener="#{usuarioController.editarUsuario()}" /> 
+                            <p:commandButton value="Cerrar" icon="ui-icon-circle-close" onclick="dlgDialog.hide()" process="@this"/>
+                        </f:facet>
+                    </h:panelGrid>
+                </p:dialog>
+                <p:dialog header="Pegrunta" widgetVar="dlgPregunta" modal="true" resizable="false"
+                          draggable="false" position="center">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="¿Esta seguro que desea eliminar este registro.?" class="label_negrilla"/>
+                        <h:outputText value="* Recuerde que este registro puede estar enlazada con algunas funciones del sistema."/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="SI" icon="ui-icon-circle-check" actionListener="#{usuarioController.eliminarUsuario()}"
+                                             update=":frmListado:pnlListado,:frmDialogos:mensajes" process="@this"/>
+                            <p:commandButton value="NO" icon="ui-icon-circle-close" onclick="dlgPregunta.hide()" process="@this"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+
+    </ui:composition>
+</html>

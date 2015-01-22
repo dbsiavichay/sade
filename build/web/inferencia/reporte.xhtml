@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"      
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>        
+    </h:head>
+    <h:body>
+        <h:form>
+            <p:media value="#{reporteDocenteController.urlReporte}"  width="100%" height="500">
+                Su navegador no soporta pdf., <h:outputLink value="#{reporteDocenteController.urlReporte}">click</h:outputLink> para descargarlo. 
+            </p:media>
+        </h:form>
+    </h:body>
+</html>

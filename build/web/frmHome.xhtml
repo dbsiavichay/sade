@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+    <ui:composition template="/templates/templatePrivado.xhtml">
+
+        <ui:define name="tituloPagina">
+            SITIO PRIVADO
+        </ui:define>
+
+        <ui:define name="cabecera">
+            <h:outputStylesheet name="css/cssLayout.css"/>
+            <h:form id="frmCabecera">                
+                <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>                
+                <div class="datos">
+                    <h:panelGrid columns="3" styleClass="informacion" columnClasses="celdainformacion,celdaroles,celdausuario">
+                        <h:outputLabel value="#{usuariosDataManager.fechaActualCiudad}" style="font-style: oblique; font-weight: bold; font-size: 9px;"/>
+                        <h:panelGrid columns="2" style="vertical-align: top">
+                            <p:selectOneMenu value="#{usuariosDataManager.rolSelected}" style="width: 150px ; font-size: 9px" panelStyleClass="comboroles"   >
+                                <f:selectItems value="#{usuariosDataManager.roles}" var="rol" itemLabel="#{rol.nombre}" itemValue="#{rol.id}"/>
+                            </p:selectOneMenu>
+                            <p:commandButton icon="ui-icon-refresh" action="#{usuariosDataManager.cambiarRol}" 
+                                             title="cambiar" update=":menu,:paginas "/>
+                        </h:panelGrid>
+
+                        <h:panelGroup style="vertical-align: top">
+                            <p:splitButton value="#{usuariosDataManager.usuarioSesion.nombreCompleto}" styleClass="comboroles">  
+                                <p:menuitem value="Cambiar mi contraseña" icon="ui-icon-person" update=":paginas">
+                                    <f:setPropertyActionListener value="cambiarPassword.xhtml" target="#{usuariosDataManager.pagina}"/>
+                                </p:menuitem>
+                                <p:separator />  
+                                <p:menuitem value="Cerrar sesión" action="#{usuariosDataManager.cerrarSesion}" ajax="false" icon="ui-icon-power"/>  
+                            </p:splitButton>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </div>                
+            </h:form>
+        </ui:define>
+
+        <ui:define name="menu">
+
+            <h:form id="menu" style="background: white">
+                <p:panelMenu>
+                    <c:forEach items="#{usuariosDataManager.menuUsuario}" var="nodo">
+                        <p:submenu label="#{nodo.descripcion}">                        
+                            <c:if test="#{not empty nodo.hijos}">                                
+                                <c:forEach var="subnodo" items="#{nodo.hijos}">                                       
+                                    <c:if test="#{not empty subnodo.hijos}">
+                                        <p:submenu label="#{subnodo.descripcion}">
+                                            <c:forEach var="item" items="#{subnodo.hijos}">
+                                                <p:menuitem value="#{item.descripcion}" action="#{usuariosDataManager.asignarPermisos()}" update=":paginas"  icon="ui-icon-arrowreturn-1-e">                                                
+                                                    <f:setPropertyActionListener value="#{item.url}" target="#{usuariosDataManager.pagina}"/>
+                                                    <f:setPropertyActionListener value="#{item.codigo}" target="#{usuariosDataManager.accionSelected}"/>
+                                                </p:menuitem>
+                                            </c:forEach>
+                                        </p:submenu>                                            
+                                    </c:if>
+                                    <c:if test="#{empty subnodo.hijos}">
+                                        <p:menuitem value="#{subnodo.descripcion}" action="#{usuariosDataManager.asignarPermisos()}" update=":paginas"  icon="ui-icon-arrowreturn-1-e" ajax="">                                                
+                                            <f:setPropertyActionListener value="#{subnodo.url}" target="#{usuariosDataManager.pagina}"/>
+                                            <f:setPropertyActionListener value="#{subnodo.codigo}" target="#{usuariosDataManager.accionSelected}"/>
+                                        </p:menuitem>
+                                    </c:if>
+                                </c:forEach>                                
+                            </c:if>                        
+                        </p:submenu>
+                    </c:forEach>
+                </p:panelMenu>
+            </h:form>
+        </ui:define>
+
+        <ui:define name="formularios">
+            <p:outputPanel id="paginas" style="height: 100%;min-height: 500px">
+                <p:messages />
+                <iframe name="paginas" width="99.8%" height="500px" src="#{usuariosDataManager.pagina}" style="border: 0"/>
+            </p:outputPanel>
+        </ui:define>
+
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+        </ui:define>
+
+    </ui:composition>
+
+</html>
+

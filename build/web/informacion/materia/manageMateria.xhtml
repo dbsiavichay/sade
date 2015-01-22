@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            Administración de Materias
+        </ui:define>
+        <ui:define name="listados">
+
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+
+                <p:panel id="pnlListado" header="Administración de Materias">
+                    <p:messages id="msgListados"/>
+                    
+                        <p:commandButton id="btnSinc" value="Sincronizar" icon="ui-icon-transfer-e-w"  title="Sincronizar con oasis" 
+                                         actionListener="#{materiaController.sincronizarConOasis()}"
+                                         rendered="#{usuariosDataManager.funcionActual.agregar}" update=":frmListado:pnlListado,:frmDialogos:mensajes" />
+                        <p:separator id="separator"/> 
+                        <h:panelGrid columns="3" columnClasses="columna_izquierda"  >
+                            <h:outputLabel value="Carreras: " class="label_negrilla" />
+                            <p:selectOneMenu  id="cboCarreras" value="#{materiaController.carreraSeleccionada}">     
+                                <f:selectItem itemLabel="Seleccionar" itemValue="" />  
+                                <f:selectItems value="#{materiaController.carreras}" var="carrera" itemLabel="#{carrera.nombre}" itemValue="#{carrera.codigo}"/>
+                                <f:selectItem itemLabel="TODAS" itemValue="0" />  
+                            </p:selectOneMenu>
+                            <p:commandButton id="btnActualizar" icon="ui-icon-refresh" title="Actualizar"
+                                             actionListener="#{materiaController.cambiarListaMaterias()}" update=":frmListado:pnlListado,:frmDialogos:mensajes">
+                            </p:commandButton>
+                        </h:panelGrid>                        
+                        <p:dataTable id="tblMaterias" var="materia"  value="#{materiaController.materias}" filteredValue="#{materiaController.materiasFiltrado}" 
+                                     paginator="#{materiaController.materias.size()>10}" rows="10" emptyMessage="#{mensajes.sinDatos}" >                            
+                            <p:column sortBy="#{materia.codigoCarrera}:#{materia.nombreCarrera}" headerText="CARRERA"  filterBy="#{materia.codigoCarrera}:#{materia.nombreCarrera}"  filterMatchMode="contains">
+                                    #{materia.codigoCarrera}:#{materia.nombreCarrera}  
+                            </p:column>      
+                            <p:column sortBy="#{materia.codigoMateria}" headerText="COD MATERIA"  filterBy="#{materia.codigoMateria}"  filterMatchMode="contains">
+                                    #{materia.codigoMateria}  
+                            </p:column>      
+                            <p:column sortBy="#{materia.nombreMateria}" headerText="MATERIA"  filterBy="#{materia.nombreMateria}"  filterMatchMode="contains">
+                                    #{materia.nombreMateria}  
+                            </p:column>      
+                            
+                            <p:column>
+                                <p:commandButton id="btnVer" icon="ui-icon-search" title="Ver" oncomplete="dlgDialog.show()" 
+                                                 action="#{materiaController.preparaVer()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" >
+                                    <f:setPropertyActionListener value="#{materia}" target="#{materiaController.materiaActual}"/>                                    
+                                </p:commandButton>                                
+                                <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar" oncomplete="dlgPregunta.show()"
+                                                 update=":frmDialogos:pnlDatos" rendered="#{usuariosDataManager.funcionActual.eliminar}">
+                                    <f:setPropertyActionListener value="#{materia}" target="#{materiaController.materiaActual}"/>
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>                    
+                </p:panel>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos">
+                <p:dialog header="Datos de Materia" widgetVar="dlgDialog" modal="true" resizable="false"
+                          draggable="true" position="center" width="700">
+                    <p:growl id="mensajes"/>
+                    <h:panelGrid id="pnlDatos" columns="3" columnClasses="columna_derecha,columna_izquierda" >                                                                                                
+                        <h:outputLabel value="Carrera" for="txtCarrera" class="label_negrilla"/>
+                        <p:inputText id="txtCarrera" value="#{materiaController.materiaActual.codigoCarrera}:#{materiaController.materiaActual.nombreCarrera}" title="Carrera" 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="50" disabled="#{not materiaController.ingresaDatos}"/>
+                        <p:message for="txtCarrera" />                                                 
+                        
+                        <h:outputLabel value="Cod Materia" for="txtCodigoMateria" class="label_negrilla"/>
+                        <p:inputText id="txtCodigoMateria" value="#{materiaController.materiaActual.codigoMateria}" title="Código de la materia" 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="50" disabled="#{not materiaController.ingresaDatos}"/>
+                        <p:message for="txtCodigoMateria" />   
+                        
+                        <h:outputLabel value="Materia" for="txtMateria" class="label_negrilla"/>
+                        <p:inputText id="txtMateria" value="#{materiaController.materiaActual.nombreMateria}" title="Nombre del materia" 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="50" disabled="#{not materiaController.ingresaDatos}"/>
+                        <p:message for="txtMateria" />                        
+                                                
+                        <f:facet name="footer">
+                            <p:commandButton value="Guardar"  id="btnGuardar" icon="ui-icon-circle-check" 
+                                             rendered="#{materiaController.nuevo and materiaController.ingresaDatos}" title="Guardar" 
+                                             action="#{materiaController.guardarMateria()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"/> 
+                            <p:commandButton value="Guardar"  id="btnActualizar" icon="ui-icon-pencil" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"
+                                             rendered="#{materiaController.editar and (materiaController.ingresaDatos) }" title="Actualizar"    
+                                             actionListener="#{materiaController.editarMateria()}" /> 
+                            <p:commandButton value="Cerrar" icon="ui-icon-circle-close" onclick="dlgDialog.hide()" process="@this"/>
+                        </f:facet>
+                    </h:panelGrid>
+                </p:dialog>
+                <p:dialog header="Pregunta" widgetVar="dlgPregunta" modal="true" resizable="false"
+                          draggable="false" position="center">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="¿Esta seguro que desea eliminar este registro.?" class="label_negrilla"/>
+                        <h:outputText value="* Recuerde que este registro puede estar enlazada con algunas funciones del sistema."/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="SI" icon="ui-icon-circle-check" actionListener="#{materiaController.eliminarMateria()}"
+                                             update=":frmListado:pnlListado,:frmDialogos:mensajes" process="@this"/>
+                            <p:commandButton value="NO" icon="ui-icon-circle-close" onclick="dlgPregunta.hide()" process="@this"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+
+    </ui:composition>
+</html>

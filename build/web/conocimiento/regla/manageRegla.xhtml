@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            Administración de Reglas
+        </ui:define>        
+        <ui:define name="listados">            
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+                <p:panel id="pnlListado" header="Administración de Reglas">
+                    <p:messages id="msgListados"/>                                                          
+                    <p:commandButton id="btnSincronizar" value="GENERAR REGLAS" icon="ui-icon-circle-plus"  title="Generación de reglas en base a campos especificos"
+                                     action="#{reglaController.generarReglas()}" update=":frmDialogos:mensajes, :frmListado:pnlListado"
+                                     rendered="#{usuariosDataManager.funcionActual.agregar}"/>                           
+                    <p:separator/>
+                    <h:panelGrid columns="2">                         
+                        <p:selectOneMenu  id="cboCampoAmplio" value="#{reglaController.campoAmplioSeleccionado}" filter="true" filterMatchMode="contains"
+                                          style="width: 250px; margin-bottom:5px;">     
+                            <f:selectItem itemLabel="Seleccionar Campo Amplio" itemValue="" />  
+                            <f:selectItems value="#{campoAmplioController.camposAmplios}" var="campoAmplio" itemLabel="#{campoAmplio.nombre}" itemValue="#{campoAmplio.id}"/>
+                            <p:ajax listener="#{reglaController.cambiarListaCampoEspecifico()}" update=":frmDialogos:mensajes,cboCampoEspecifico"/>
+                        </p:selectOneMenu>
+                        <p:selectOneMenu  id="cboCampoEspecifico" value="#{reglaController.campoEspecificoSeleccionado}" filter="true" filterMatchMode="contains"
+                                          style="width: 250px; margin-bottom: 5px">     
+                            <f:selectItem itemLabel="Seleccionar Campo Especifico" itemValue="" />  
+                            <f:selectItems value="#{reglaController.camposEspecificos}" var="camposEspecificos" itemLabel="#{camposEspecificos.nombre}" itemValue="#{camposEspecificos.id}"/>
+                            <p:ajax listener="#{reglaController.cambiarListaReglas()}" update=":frmDialogos:mensajes,:frmListado:pnlListado"/>
+                        </p:selectOneMenu>                                                                                                                             
+                    </h:panelGrid>                                                
+                    <p:dataTable id="tblReglas" var="regla"  value="#{reglaController.reglas}" filteredValue="#{reglaController.reglasFiltro}"
+                                 paginator="#{reglaController.reglas.size()>10}" rows="10" emptyMessage="#{mensajes.sinDatos}">                                                                                    
+                        <p:column sortBy="#{regla.campoTitulo.nombre}" headerText="TÍTULOS DE"  filterBy="#{regla.campoTitulo.nombre}"  filterMatchMode="contains">
+                            #{regla.campoTitulo.nombre}
+                        </p:column>
+                        <p:column sortBy="#{regla.campoMateria.nombre}" headerText="MATERIAS DE"  filterBy="#{regla.campoMateria.nombre}"  filterMatchMode="contains">
+                            #{regla.campoMateria.nombre}
+                        </p:column>
+                        <p:column headerText="CERTEZA" sortBy="#{regla.certeza}">
+                            #{regla.certeza}                                 
+                        </p:column>
+
+                        <p:column>  
+                            <p:commandButton id="btnEditar" icon="ui-icon-pencil" title="Editar" oncomplete="dlgDialog.show()" 
+                                             update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" rendered="#{usuariosDataManager.funcionActual.editar}">
+                                <f:setPropertyActionListener value="#{regla}" target="#{reglaController.reglaActual}"/>                                    
+                            </p:commandButton>                                
+                            <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar" oncomplete="dlgPregunta.show()"
+                                             update=":frmDialogos:mensajes" rendered="#{usuariosDataManager.funcionActual.eliminar}">
+                                <f:setPropertyActionListener value="#{regla}" target="#{reglaController.reglaActual}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>                        
+                </p:panel>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos">
+                <p:growl id="mensajes"/>                
+                <p:dialog header="Datos de Regla" widgetVar="dlgDialog" modal="true" resizable="false"
+                          draggable="true" position="center" width="700">                    
+                    <h:panelGrid id="pnlDatos" columns="3" columnClasses="columna_derecha,columna_izquierda" >                                                                                                
+                        <h:outputLabel value="Titulo de" for="txtCampoTitulo" class="label_negrilla"/>
+                        <p:inputText id="txtCampoTitulo" value="#{reglaController.reglaActual.campoTitulo.nombre}" title="Campo específico" 
+                                     size="50" readonly="true"/>
+                        <p:message for="txtCampoTitulo" />                                                 
+
+                        <h:outputLabel value="Materia de" for="txtCampoMateria" class="label_negrilla"/>
+                        <p:inputText id="txtCampoMateria" value="#{reglaController.reglaActual.campoMateria.nombre}" title="Campo específico" 
+                                     size="50" readonly="true"/>
+                        <p:message for="txtCampoMateria" />                                                                                                
+
+                        <h:outputLabel value="Certeza" for="spnCerteza" class="label_negrilla"/>
+                        <p:spinner id="spnCerteza" value="#{reglaController.reglaActual.certeza}" title="Valor de certeza" 
+                                   min="0.00" max="1.00" stepFactor="0.01" required="true" requiredMessage="Este campo es obligatorio"/>
+                        <p:message for="spnCerteza" />                                                                                                
+
+                        <f:facet name="footer">                            
+                            <p:commandButton value="Guardar"  id="btnActualizar" icon="ui-icon-pencil" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"
+                                             title="Actualizar" actionListener="#{reglaController.editarRegla()}" /> 
+                            <p:commandButton value="Cerrar" icon="ui-icon-circle-close" onclick="dlgDialog.hide()" process="@this"/>
+                        </f:facet>
+                    </h:panelGrid>
+                </p:dialog>
+
+                <p:dialog header="Pegrunta" widgetVar="dlgPregunta" modal="true" resizable="false"
+                          draggable="false" position="center">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="¿Esta seguro que desea eliminar este registro.?" class="label_negrilla"/>
+                        <h:outputText value="* Recuerde que este registro puede estar enlazada con algunas funciones del sistema."/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="SI" icon="ui-icon-circle-check" actionListener="#{reglaController.eliminarRegla()}"
+                                             update=":frmListado:pnlListado,:frmDialogos:mensajes" process="@this"/>
+                            <p:commandButton value="NO" icon="ui-icon-circle-close" onclick="dlgPregunta.hide()" process="@this"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+
+    </ui:composition>
+</html>

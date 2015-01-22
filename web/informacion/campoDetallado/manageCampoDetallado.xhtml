@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            Administración de Campos Detallados
+        </ui:define>
+        <ui:define name="listados">
+
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+
+                <p:panel id="pnlListado" header="Administración de Campos Detallados">
+                    <p:messages id="msgListados"/>
+
+                    <p:commandButton id="btnNuevo" value="Nuevo" icon="ui-icon-circle-plus"  title="Nuevo" 
+                                     actionListener="#{campoDetalladoController.preparaNuevo()}"  oncomplete="dlgDialog.show()" 
+                                     rendered="#{usuariosDataManager.funcionActual.agregar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" />
+                    <p:separator id="separator"/> 
+                    <h:panelGrid columns="3" columnClasses="columna_izquierda"  >
+                        <h:outputLabel value="Campo Especifico: " class="label_negrilla" />                            
+                        <p:selectOneMenu  id="cboCampoEspecifico" value="#{campoDetalladoController.campoEspecificoSeleccionado}">                                       
+                            <f:selectItem itemLabel="Seleccionar" itemValue="" />
+                            <f:selectItems value="#{campoEspecificoController.camposEspecificos}" var="campoEspecifico" itemLabel="#{campoEspecifico.nombre}" itemValue="#{campoEspecifico.id}"/>
+                            <f:selectItem itemLabel="TODAS" itemValue="0" />
+                        </p:selectOneMenu>
+                        <p:commandButton id="btnActualizar" icon="ui-icon-refresh" title="Actualizar"
+                                         actionListener="#{campoDetalladoController.cambiarListaCamposDetallados()}" update=":frmListado:pnlListado,:frmDialogos:mensajes">
+                        </p:commandButton>
+                    </h:panelGrid> 
+                    <p:dataTable id="tblCamposDetallados" var="campoDetallado"  value="#{campoDetalladoController.camposDetallados}" filteredValue="#{campoDetalladoController.camposDetalladosFiltrado}" 
+                                 paginator="#{campoDetalladoController.camposDetallados.size()>10}" rows="10" emptyMessage="#{mensajes.sinDatos}" >                            
+                        <p:column sortBy="#{campoDetallado.codigo}" headerText="CÓDIGO"  filterBy="#{campoDetallado.codigo}"  filterMatchMode="contains">
+                            #{campoDetallado.codigo}  
+                        </p:column>      
+                        <p:column sortBy="#{campoDetallado.nombre}" headerText="NOMBRE"  filterBy="#{campoDetallado.nombre}"  filterMatchMode="contains">
+                            #{campoDetallado.nombre}  
+                        </p:column>      
+
+                        <p:column>
+                            <p:commandButton id="btnVer" icon="ui-icon-search" title="Ver" oncomplete="dlgDialog.show()" 
+                                             action="#{campoDetalladoController.preparaVer()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" >
+                                <f:setPropertyActionListener value="#{campoDetallado}" target="#{campoDetalladoController.campoDetalladoActual}"/>                                    
+                            </p:commandButton>
+                            <p:commandButton id="btnEditar" icon="ui-icon-pencil"  title="Editar" oncomplete="dlgDialog.show()"
+                                             action="#{campoDetalladoController.preparaEditar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes"
+                                             rendered="#{usuariosDataManager.funcionActual.editar}" >
+                                <f:setPropertyActionListener value="#{campoDetallado}" target="#{campoDetalladoController.campoDetalladoActual}"/>
+
+                            </p:commandButton>
+                            <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar" oncomplete="dlgPregunta.show()"
+                                             update=":frmDialogos:pnlDatos" rendered="#{usuariosDataManager.funcionActual.eliminar}">
+                                <f:setPropertyActionListener value="#{campoDetallado}" target="#{campoDetalladoController.campoDetalladoActual}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>                    
+                </p:panel>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos">
+                <p:dialog header="Datos de CampoDetallado" widgetVar="dlgDialog" modal="true" resizable="false"
+                          draggable="true" position="center" width="700">
+                    <p:growl id="mensajes"/>
+                    <h:panelGrid id="pnlDatos" columns="3" columnClasses="columna_derecha,columna_izquierda" >
+
+                        <h:outputLabel value="Campo Específico" for="cboCampoEspecifico" class="label_negrilla"/>
+                        <p:selectOneMenu  id="cboCampoEspecifico" value="#{campoDetalladoController.campoDetalladoActual.idCampoEspecifico}"
+                                          required="true" requiredMessage="Este campo es obligatorio" disabled="#{not campoDetalladoController.ingresaDatos}">                                       
+                            <f:selectItem itemLabel="Seleccionar" itemValue="" />
+                            <f:selectItems value="#{campoEspecificoController.camposEspecificos}" var="campoEspecifico" itemLabel="#{campoEspecifico.nombre}" itemValue="#{campoEspecifico.id}"/>                            
+                        </p:selectOneMenu>
+                        <p:message for="cboCampoEspecifico" /> 
+
+                        <h:outputLabel value="Código" for="txtCodigo" class="label_negrilla"/>
+                        <p:inputText id="txtCodigo" value="#{campoDetalladoController.campoDetalladoActual.codigo}" title="Codigo de campo propuesto por CINE" 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="25" disabled="#{not campoDetalladoController.ingresaDatos}"/>
+                        <p:message for="txtCodigo" />                        
+
+                        <h:outputLabel value="Nombre" for="txtNombre" class="label_negrilla"/>
+                        <p:inputText id="txtNombre" value="#{campoDetalladoController.campoDetalladoActual.nombre}" title="Nombre del campo de estudio" 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="75" disabled="#{not campoDetalladoController.ingresaDatos}"/>
+                        <p:message for="txtNombre" />                        
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Guardar"  id="btnGuardar" icon="ui-icon-circle-check" 
+                                             rendered="#{campoDetalladoController.nuevo and campoDetalladoController.ingresaDatos}" title="Guardar" 
+                                             action="#{campoDetalladoController.guardarCampoDetallado()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"/> 
+                            <p:commandButton value="Guardar"  id="btnActualizar" icon="ui-icon-pencil" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"
+                                             rendered="#{campoDetalladoController.editar and (campoDetalladoController.ingresaDatos) }" title="Actualizar"    
+                                             actionListener="#{campoDetalladoController.editarCampoDetallado()}" /> 
+                            <p:commandButton value="Cerrar" icon="ui-icon-circle-close" onclick="dlgDialog.hide()" process="@this"/>
+                        </f:facet>
+                    </h:panelGrid>
+                </p:dialog>
+                <p:dialog header="Pregunta" widgetVar="dlgPregunta" modal="true" resizable="false"
+                          draggable="false" position="center">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="¿Esta seguro que desea eliminar este registro.?" class="label_negrilla"/>
+                        <h:outputText value="* Recuerde que este registro puede estar enlazada con algunas funciones del sistema."/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="SI" icon="ui-icon-circle-check" actionListener="#{campoDetalladoController.eliminarCampoDetallado()}"
+                                             update=":frmListado:pnlListado,:frmDialogos:mensajes" process="@this"/>
+                            <p:commandButton value="NO" icon="ui-icon-circle-close" onclick="dlgPregunta.hide()" process="@this"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+
+    </ui:composition>
+</html>

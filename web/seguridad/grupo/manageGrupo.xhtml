@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            Administración de Grupos
+        </ui:define>
+        <ui:define name="listados">
+
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+                <p:panel id="pnlListado" header="Administración de grupos">
+                    <p:messages id="msgListados"/>
+                    <p:commandButton id="btnNuevo" value="Nuevo" icon="ui-icon-circle-plus"  title="Nuevo" 
+                                     actionListener="#{grupoController.preparaNuevo()}"  oncomplete="dlgDialog.show()" 
+                                     rendered="#{usuariosDataManager.funcionActual.agregar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" />
+                    <p:separator id="separator"/> 
+                    <p:dataTable id="tblGrupos" var="grupo"  value="#{grupoController.grupos}" filteredValue="#{grupoController.gruposFiltro}" 
+                                 paginator="#{grupoController.grupos.size()>10}" rows="10" emptyMessage="#{mensajes.sinDatos}" >                            
+                        <p:column sortBy="#{grupo.nombre}" headerText="NOMBRE"  filterBy="#{grupo.nombre}"  filterMatchMode="contains">
+                            #{grupo.nombre}
+                        </p:column>
+                        <p:column headerText="ORDEN" sortBy="#{grupo.orden}">
+                            #{grupo.orden}
+                        </p:column>
+                        <p:column headerText="PADRE">                                
+                            #{grupo.padre}
+                        </p:column>                            
+                        <p:column>
+                            <p:commandButton id="btnVer" icon="ui-icon-search" title="Ver" oncomplete="dlgDialog.show()" 
+                                             action="#{grupoController.preparaVer()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" >
+                                <f:setPropertyActionListener value="#{grupo}" target="#{grupoController.grupoActual}"/>                                    
+                            </p:commandButton>
+                            <p:commandButton id="btnEditar" icon="ui-icon-pencil"  title="Editar" oncomplete="dlgDialog.show()"
+                                             action="#{grupoController.preparaEditar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes"
+                                             rendered="#{usuariosDataManager.funcionActual.editar}" >
+                                <f:setPropertyActionListener value="#{grupo}" target="#{grupoController.grupoActual}"/>
+
+                            </p:commandButton>
+                            <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar" oncomplete="dlgPregunta.show()"
+                                             update=":frmDialogos:pnlDatos" rendered="#{usuariosDataManager.funcionActual.eliminar}">
+                                <f:setPropertyActionListener value="#{grupo}" target="#{grupoController.grupoActual}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>                    
+                </p:panel>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos">
+                <p:dialog header="Datos de Grupo" widgetVar="dlgDialog" modal="true" resizable="false"
+                          draggable="true" position="center" width="700">
+                    <p:growl id="mensajes"/>
+                    <h:panelGrid id="pnlDatos" columns="3" columnClasses="columna_derecha,columna_izquierda" >
+                        <h:outputLabel value="Nombre" for="txtNombre" class="label_negrilla"/>
+                        <p:inputText id="txtNombre" value="#{grupoController.grupoActual.nombre}" title="Nombre de la grupo" 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="25" disabled="#{not grupoController.ingresaDatos}"/>
+                        <p:message for="txtNombre" />
+                        
+                        <h:outputLabel value="Orden" for="txtOrden" class="label_negrilla"/>
+                        <p:inputText id="txtOrden" value="#{grupoController.grupoActual.orden}" title="Orden de la grupo" 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="25" disabled="#{not grupoController.ingresaDatos}"/>
+                        <p:message for="txtOrden" />
+
+                        <h:outputLabel value="Padre" for="cboPadre" class="label_negrilla" />
+                        <p:selectOneMenu  id="cboPadre" value="#{grupoController.grupoActual.padre}" disabled="#{not grupoController.ingresaDatos}">
+                            <f:selectItem itemLabel="Seleccionar" itemValue="0" />  
+                            <f:selectItems value="#{grupoController.grupos}" var="grupo" itemLabel="#{grupo.nombre}" itemValue="#{grupo.id}"/>
+                        </p:selectOneMenu>
+                        <p:message for="cboPadre" />                        
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Guardar"  id="btnGuardar" icon="ui-icon-circle-check" 
+                                             rendered="#{grupoController.nuevo and grupoController.ingresaDatos}" title="Guardar" 
+                                             action="#{grupoController.guardarGrupo()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"/> 
+                            <p:commandButton value="Guardar"  id="btnActualizar" icon="ui-icon-pencil" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"
+                                             rendered="#{grupoController.editar and (grupoController.ingresaDatos) }" title="Actualizar"    
+                                             actionListener="#{grupoController.editarGrupo()}" /> 
+                            <p:commandButton value="Cerrar" icon="ui-icon-circle-close" onclick="dlgDialog.hide()" process="@this"/>
+                        </f:facet>
+                    </h:panelGrid>
+                </p:dialog>
+                <p:dialog header="Pegrunta" widgetVar="dlgPregunta" modal="true" resizable="false"
+                          draggable="false" position="center">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="¿Esta seguro que desea eliminar este registro.?" class="label_negrilla"/>
+                        <h:outputText value="* Recuerde que este registro puede estar enlazada con algunas funciones del sistema."/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="SI" icon="ui-icon-circle-check" actionListener="#{grupoController.eliminarGrupo()}"
+                                             update=":frmListado:pnlListado,:frmDialogos:mensajes" process="@this"/>
+                            <p:commandButton value="NO" icon="ui-icon-circle-close" onclick="dlgPregunta.hide()" process="@this"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+
+    </ui:composition>
+</html>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            Resultados por paquete
+        </ui:define>
+        <ui:define name="listados">
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">                
+                <p:messages id="mensajes"/>                                   
+                <p:panel header="Resultados por paquete"> 
+                    <p:panel id="pnlListado" header="Paquetes disponibles" style="display: inline-block; width: 38%;vertical-align: top; margin-right: 5px">                        
+                        <p:selectOneListbox id="lstPaquetes" value="#{resultadoController.procesoSeleccionado}" style="height: 300px; width: 100%">                            
+                            <f:selectItems value="#{procesoController.procesos}" var="proceso" itemLabel="#{proceso.codigo}, #{proceso.descripcion}" itemValue="#{proceso.id}"/>
+                            <p:ajax listener="#{resultadoController.cambiarListaResultados()}" update=":frmListado:mensajes,:frmListado:pnlDatos"/>                           
+                        </p:selectOneListbox>
+                    </p:panel>
+                    <p:panel id="pnlDatos" header="Resultados de paquete" style="display: inline-block; width: 58%;vertical-align: top">                                                                                                
+                        <p:dataList value="#{resultadoController.resultados}" var="detalle" type="ordered">                            
+                            <b>#{detalle.valor},</b> #{detalle.reporte.docente.nombreCompleto}
+                        </p:dataList> 
+                        <f:facet name="footer">                            
+                            <h:outputLink target="_blank" value="#{resultadoController.generarPorPaquete()}"
+                                          rendered="#{not empty resultadoController.resultados}">Imprimir</h:outputLink>                            
+                        </f:facet>
+                    </p:panel>                    
+                </p:panel>                
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos">                 
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

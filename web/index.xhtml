@@ -1,0 +1,257 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title><ui:insert name="tituloPagina">SISTEMA DE ASIGNACIÓN DE DOCENTES ESPOCH</ui:insert></title>
+        <h:outputStylesheet library="css" name="default.css"/>
+        <h:outputStylesheet library="css" name="cssLayout.css"/>
+    </h:head>
+
+    <h:body>        
+        <p:spacer height="30" />
+        <p:panel style="width: 70%; margin: 0 auto; padding: 70px 0; min-width: 950px">
+            
+            <h:panelGrid id="pnlGlobal" columns="4"  columnClasses="columna_derecha,columna_izquierda">
+
+                <p:spacer width="65"/>
+                
+                <h:panelGrid>
+                    <h:graphicImage value="/resources/imagenes/logos/logop.png"/>
+                </h:panelGrid>
+
+                <p:spacer width="50"/>
+                
+                <h:form id="frmLogin" style="background: #F0F0F0">
+                    <p:messages  id="mensajes"/>
+                    <p:panel style="margin: 0 auto">
+
+                        <h:outputText value="Inicio de sesión" class="label_negrilla"/>
+                        <p:separator id="separator1"/>
+                        <p:spacer height="15"/>
+                        <h:panelGrid id="pnlLogin" columns="3"  columnClasses="columna_derecha,columna_izquierda,columna_izquierda">
+                            <h:outputText value="Usuario:" class="label_negrilla"/>
+                            <p:inputText id="txtUsuario" required="true" value="#{usuariosDataManager.usuarioSesion.cedula}"
+                                        requiredMessage="Es necesario ingresar." title="Nombre de usuario"/>
+                            <p:message for="txtUsuario"/>
+
+                            <h:outputText value="Contraseña:" class="label_negrilla"/>
+                            <p:password id="txtContrasena" required="true" value="#{usuariosDataManager.usuarioSesion.contrasena}"
+                                        requiredMessage="Es necesario ingresar." feedback="false" title="Password"/>
+                            <p:message for="txtContrasena"/>
+                        </h:panelGrid>
+                        <p:spacer height="15"/>
+                        <p:separator id="separator2"/>
+                        <p:commandButton id="btnIniciar" value="Iniciar Sesión" action="#{usuariosDataManager.ingresarSistema()}" 
+                                        update="mensajes, pnlLogin" title="Ingresar al sistema" ajax="false"/>
+                    </p:panel>
+                </h:form>  
+            </h:panelGrid> 
+            
+            <p:spacer height="25"/>
+            
+            <h:panelGrid style="text-align: right; width: 100%">¿No dispone de una cuenta? 
+                <p:commandLink style="font-size: 14px;color: #009933; font-weight: bold" oncomplete="dlgDialog.show()" update=":frmDialogos:pnlRegistroUsuario,:frmDialogos:mensajes" process="@this" actionListener="#{usuarioController.preparaNuevo()}">Regístrese ahora</p:commandLink>
+            </h:panelGrid>
+            
+        </p:panel>  
+
+        <h:form id="frmInferior">                
+            <h:panelGrid style="margin: 15px auto" id="pnlInferior" columns="8"  columnClasses="columna_derecha,columna_izquierda">
+                        <h:panelGrid>
+                            <p:commandLink style="font-size: 10px;color: #009933; font-weight: bold" oncomplete="dlgDialogContactos.show()">Contáctanos</p:commandLink>
+                        </h:panelGrid>
+                        <h:panelGrid style="color: #333333; font-weight: bold">|</h:panelGrid>
+                        <h:panelGrid>
+                            <p:commandLink style="font-size: 10px;color: #009933; font-weight: bold" oncomplete="dlgDialogComentarios.show()" update=":frmInferior,:frmDialogos:pnlComentarios">Comentarios</p:commandLink>
+                        </h:panelGrid>
+                        <h:panelGrid style="color: #333333; font-weight: bold">|</h:panelGrid>
+                        <h:panelGrid>
+                            <p:commandLink style="font-size: 10px;color: #009933; font-weight: bold" oncomplete="dlgDialogCreditos.show()">Créditos</p:commandLink>
+                        </h:panelGrid>
+                        <h:panelGrid style="color: #333333; font-weight: bold">|</h:panelGrid>
+                        <h:panelGrid>
+                            <p:commandLink style="font-size: 10px;color: #009933; font-weight: bold" oncomplete="dlgDialogDerechosAutor.show()">Derechos de Autor</p:commandLink>
+                        </h:panelGrid>
+                        <h:panelGrid style="color: #333333; font-weight: bold">2014 ESPOCH</h:panelGrid>
+            </h:panelGrid>   
+        </h:form>
+        
+        <h:form id="frmDialogos">
+            
+                <p:dialog header="Contáctanos" widgetVar="dlgDialogContactos" modal="true" resizable="false"
+                          draggable="true" position="center" width="700">
+                    <h:panelGrid id="pnlContactos" columns="3" columnClasses="columna_derecha,columna_izquierda" >
+                        <h:panelGrid>
+                            <h:graphicImage style="width: 200px; height: 200px" value="/resources/imagenes/logos/escudoespoch.gif"/>
+                        </h:panelGrid> 
+                        <p:spacer width="30"/>
+                        <h:panelGrid>
+                            <b>Matriz ESPOCH:</b><br></br>
+                            Dirección: Panamericana Sur km 1 1/2, Riobamba - Ecuador | Teléfono: 593 (03) 2 998-200 | Telefax: (03) 2 317-001 | Código Postal: EC060155
+                            <br></br>
+                            <br></br>
+                            <b>Desarrolladores:</b><br></br>
+                            Contactos: Denis Siavichay P. (0979987040) - Luis Parra R. (0994034481)<br></br> Macas - Morona Santiago - Ecuador
+                        </h:panelGrid>                  
+                    </h:panelGrid>
+                </p:dialog>
+            
+            
+                <p:dialog header="Comentarios" widgetVar="dlgDialogComentarios" modal="true" resizable="false"
+                          draggable="true" position="center" width="600">
+                    <h:panelGrid id="pnlComentarios" columns="3" columnClasses="columna_derecha,columna_izquierda" >
+                        <h:panelGrid>
+                            <h:graphicImage style="width: 200px; height: 200px" value="/resources/imagenes/logos/escudoespoch.gif"/>
+                        </h:panelGrid> 
+                        <p:spacer width="30"/>
+                        <h:panelGrid>
+                                <p:panel id="pnlFormulario">  
+                                        <h:panelGrid columns="3" cellpadding="5">  
+                                            <p:outputLabel for="txtnombre" value="Nombre:"/>   
+                                            <p:inputText id="txtnombre" value="" size="35" required="false"/>  
+                                            <p:message for="txtnombre" />
+                                            
+                                            <p:outputLabel for="txtemail" value="Email:"/>   
+                                            <p:inputText id="txtemail" value="" size="35" required="false"/>  
+                                            <p:message for="txtemail" />
+                                            
+                                            <p:outputLabel for="txttelefono" value="Telf:"/>   
+                                            <p:inputText id="txttelefono" value="" size="35" required="false"/>
+                                            <p:message for="txttelefono" />
+                                            
+                                            <p:outputLabel for="txtmensaje" value="Mensaje:"/>   
+                                            <p:inputTextarea id="txtmensaje" rows="5" cols="35" counter="display" maxlength="250" counterTemplate="{0} characters remaining." 
+                                                             autoResize="false" required="false"/>
+                                            <p:message for="txtmensaje" />
+                                            
+                                            <h:outputText/> 
+                                            <h:outputText id="display" />   
+                                            <h:outputText/> 
+                                            
+                                            <h:outputText/> 
+                                            <p:commandButton value="Enviar" onclick="dlgDialogComentarios.hide()" process="@this"/>  
+                                            <h:outputText/> 
+                                        </h:panelGrid>  
+                                </p:panel>                            
+                        </h:panelGrid>                  
+                    </h:panelGrid>
+                </p:dialog>
+            
+            
+                <p:dialog header="Créditos" widgetVar="dlgDialogCreditos" modal="true" resizable="false"
+                          draggable="true" position="center" width="600">
+                    <h:panelGrid id="pnlCreditos" columnClasses="columna_derecha,columna_izquierda" >
+                        <h:form id="frmAbout">
+                                <p:panel style="text-align:center">
+                                    <h:panelGrid style="width:100%">
+                                        <h:graphicImage style="width: 380px; height: 100px" value = "/resources/imagenes/About.png"/>  
+                                    </h:panelGrid>
+                                </p:panel> 
+                                 <br></br>
+                                <p:panel style="text-align: center">
+                                     <h:panelGrid style="width:100%; font-size: 12px" >
+                                         <h3>SADE</h3>
+                                            <b>SADE - Sistema de Asignacion de Docentes ESPOCH </b>es un sistema desarrollado como tema de tesis por 
+                                            estudiantes de Ingeniería en Sistemas de la Ext. Morona Santiago de la primera Fase:<br></br><br></br>
+
+                                                        - Denis Braulio Siavichay Portilla.<br></br>
+                                                        - Luis Miguel Parra Romero.<br></br><br></br>
+
+                                            Este Sistema permitirá mejorar la asignación de docentes a las diferentes cátedras basándose en su perfil
+                                            profesional, en las Escuelas de la FIE. Así la Facultad de Informática y Electrónica contará con un Sistema 
+                                            de apoyo a la toma de decisiones referentes a la asignación de una cátedra a un determinado docente, esto 
+                                            ayudará al personal encargados de las contrataciones.
+                                    </h:panelGrid>
+                                </p:panel>                         
+                        </h:form>                
+                    </h:panelGrid>
+                </p:dialog>    
+            
+                <p:dialog header="Derechos de Autor" widgetVar="dlgDialogDerechosAutor" modal="true" resizable="false"
+                          draggable="true" position="center" width="700">
+                    <h:panelGrid id="pnlDerechoAutor" columns="3" columnClasses="columna_derecha,columna_izquierda" >
+                        <h:panelGrid>
+                            <h:graphicImage style="width: 200px; height: 200px" value="/resources/imagenes/logos/escudoespoch.gif"/>
+                        </h:panelGrid> 
+                        <p:spacer width="30"/>
+                        <h:panelGrid>
+                            <b>ESCUELA SUPERIOR POLITÉCNICA DE CHIMBORAZO</b><br></br>
+                            Portal Web Institucional<br></br>
+                            © Copyright ESPOCH - 2014<br></br>
+                            Riobamba - Ecuador 
+                            <br></br>
+                            <br></br>
+                            <b>DESARROLLADORES:</b><br></br>
+                            <b>Escuela Superior Politécnica de Chimborazo ext. Morona Santiago</b><br></br>
+                            Denis Braulio Siavichay Portilla<br></br>
+                            Luis Miguel Parra Romero<br></br>
+                            Macas - Ecuador
+                        </h:panelGrid>                  
+                    </h:panelGrid>
+                </p:dialog>    
+            
+                
+                <p:dialog header="Datos del Usuario" widgetVar="dlgDialog" modal="true" resizable="false"
+                        draggable="true" position="center" width="700">
+                    <p:growl id="mensajes"/>
+                    <h:panelGrid id="pnlDatos" columns="3" columnClasses="columna_derecha,columna_izquierda" >
+                        
+                        <h:panelGrid>
+                            <h:graphicImage style="width: 200px; height: 200px" value="/resources/imagenes/logos/escudoespoch.gif"/>
+                        </h:panelGrid> 
+                        
+                        <p:spacer width="30"/>
+                        
+                        <h:panelGrid id="pnlRegistroUsuario" columns="3">  
+                            <h:outputLabel value="Cédula" for="txtCedula"/>
+                            <p:inputText id="txtCedula" value="#{usuarioController.usuarioActual.cedula}" title="Cédula del usuario" 
+                                        required="true" requiredMessage="Este campo es obligatorio" size="25">
+                            </p:inputText>
+                            <p:message for="txtCedula" />
+
+                            <h:outputLabel value="Contraseña" for="txtContrasena"/>
+                            <p:password id="txtContrasena" value="#{usuarioController.usuarioActual.contrasena}" title="Contraseña" feedback="true"
+                                        required="true" requiredMessage="Este campo es obligatorio" size="25"/>
+                            <p:message for="txtContrasena" />
+
+                            <h:outputLabel value="Nombres" for="txtNombres"/>
+                            <p:inputText id="txtNombres" value="#{usuarioController.usuarioActual.nombres}" title="Nombres" 
+                                        required="true" requiredMessage="Este campo es obligatorio" size="50"/>
+                            <p:message for="txtNombres" />
+
+                            <h:outputLabel value="Apellidos" for="txtApellidos"/>
+                            <p:inputText id="txtApellidos" value="#{usuarioController.usuarioActual.apellidos}" title="Apellidos" 
+                                        required="true" requiredMessage="Este campo es obligatorio" size="50"/>
+                            <p:message for="txtApellidos" />
+
+                            <h:outputLabel value="Telefono fijo" for="txtTelefonoFijo"/>
+                            <p:inputText id="txtTelefonoFijo" value="#{usuarioController.usuarioActual.telefonoFijo}" title="Telefono fijo" 
+                                        size="25"/>
+                            <p:message for="txtTelefonoFijo" />
+
+                            <h:outputLabel value="Telefono celular" for="txtTelefonoCelular"/>
+                            <p:inputText id="txtTelefonoCelular" value="#{usuarioController.usuarioActual.telefonoCelular}" title="Telefono celular" 
+                                        size="25"/>
+                            <p:message for="txtTelefonoCelular" />
+
+                            <h:outputLabel value="Email" for="txtEmail"/>
+                            <p:inputText id="txtEmail" value="#{usuarioController.usuarioActual.email}" title="Ej: nombre@ejemplo.com" 
+                                        size="50"/>
+                            <p:message for="txtEmail" />
+
+                            <p:commandButton value="Guardar"  id="btnGuardar" icon="ui-icon-circle-check" title="Guardar" process=":frmDialogos:pnlRegistroUsuario"
+                                             action="#{usuarioController.registrarDocente()}" update=":frmDialogos:pnlRegistroUsuario,:frmDialogos:mensajes">                                
+                            </p:commandButton> 
+                            <p:commandButton value="Cerrar" icon="ui-icon-circle-close" onclick="dlgDialog.hide()" process="@this"/>
+                         </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>         
+     </h:form>
+    </h:body>
+</html>

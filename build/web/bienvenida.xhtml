@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            BIENVENIDOS A SADE
+        </ui:define>
+        <ui:define name="listados">
+
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+                <p:tabView id="tabInfo" >
+                    <p:messages id="msgListados"/>
+                    <p:tab id="pnlListado" title="BIENVENIDOS A SADE">
+                            <p:panel style="text-align:center; border: #176311">
+                                <h:panelGrid columns="1" style="width:100%">
+                                    <h:outputLabel value=""/>
+                                    <p:graphicImage  value = "/resources/imagenes/Bienvenida.png" width="800" height="70"/>  
+                                    <h:outputLabel value=""/>
+                                </h:panelGrid>
+                            </p:panel> 
+                            <table border="0" width="100%" style="color:#ffffff">
+                                <tr>
+                                    <td colspan="3" style="font-size: 17px; color: #176311" height="40"><b><center>Bienvenidos al sistema SADE</center></b></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" height="20"></td>
+                                </tr>    
+                                <tr>
+                                    <td width="20%"></td>
+                                    <td width="60%" style="font-size: 13px; color: #045491"></td>
+                                    <td width="20%"></td>                            
+                                </tr>              
+                                <tr>
+                                    <td colspan="3" height="20"></td>
+                                </tr> 
+                                <tr>
+                                    <td width="15%"></td>
+                                    <td width="70%" style="font-size: 13px; color: #176311">
+                                        Este sitio presta valiosos servicios a la Comunidad Politécnica tanto en el Área de Docentes y Administrativos.
+                                    </td>
+                                    <td width="15%"></td>                            
+                                </tr>        
+                                <tr>
+                                    <td width="15%"></td>
+                                    <td width="70%" style="font-size: 14px; color: #176311" height="50"><b>
+                                            ¿Pertenece a una de las siguientes categorías de usuarios?</b>
+                                    </td>
+                                    <td width="15%"></td>                            
+                                </tr>  
+                                <tr>
+                                    <td width="15%"></td>
+                                    <td width="70%" style="font-size: 13px; color: #176311">
+                                        <b>Docente: </b>podrá ingresar toda la información solicitada en cada formulario con respecto a su curriculum (Datos Personales y Academicos,) por ejemplo: informacion personal; estudios: primarios, secundarios, universitarios, postgrados, especializaciones, certificaciones, cursos, etc, asi como tambien deberá imprimir el reporte de sus resultados para entregar al respectivo departamento que los solicita para su verificación.
+                                    </td>
+                                    <td width="15%"></td>                            
+                                </tr>        
+                                <tr>
+                                    <td colspan="3" height="15"></td>
+                                </tr> 
+                                <tr>
+                                    <td width="15%"></td>
+                                    <td width="70%" style="font-size: 13px; color: #176311">
+                                        <b>Administrativo: </b>podrán visualizar resultados de cada uno de los docentes y materias y asi tomar decisiones para las respectivas contrataciones.
+                                    </td>
+                                    <td width="15%"></td>                            
+                                </tr>   
+                                <tr>
+                                    <td colspan="3" height="15"></td>
+                                </tr> 
+                                <tr>
+                                    <td width="15%"></td>
+                                    <td width="70%" style="font-size: 11px; color: #045491" align="center">
+<!--                                        <h:link style="font-size: 12px;color: #333333" value="Ver créditos del Sitio"  outcome="manageAboutView.xhtml"/>-->
+                                    </td>
+                                    <td width="15%"></td>                            
+                                </tr>                          
+                            </table>
+                    </p:tab>
+                </p:tabView>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos">
+                <p:dialog header="Datos de Nivel de Titulo" widgetVar="dlgDialog" modal="true" resizable="false"
+                          draggable="true" position="center" width="700">
+                    <p:growl id="mensajes"/>
+                    <h:panelGrid id="pnlDatos" columns="3" columnClasses="columna_derecha,columna_izquierda" >
+                        <h:outputLabel value="Codigo" for="txtCodigo" class="label_negrilla"/>
+                        <p:inputText id="txtCodigo" value="#{nivelTituloController.nivelTituloActual.codigo}" title="Codigo del Nivel" 
+                                     required="true" requiredMessage="El Codigo es obligatorio ingresar." size="25" disabled="#{not nivelTituloController.ingresaDatos}"/>
+                        <p:message for="txtCodigo" />
+                        
+                        <h:outputLabel value="Descripción" for="txtDescripcion" class="label_negrilla"/>
+                        <p:inputText id="txtDescripcion" value="#{nivelTituloController.nivelTituloActual.descripcion}" title="Descripción del Nivel" 
+                                     required="true" requiredMessage="Descripción es obligatorio ingresar." size="25" disabled="#{not nivelTituloController.ingresaDatos}"/>
+                        <p:message for="txtDescripcion" />                        
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Guardar"  id="btnGuardar" icon="ui-icon-circle-check" 
+                                             rendered="#{nivelTituloController.nuevo and (nivelTituloController.ingresaDatos)}" title="Guardar" 
+                                             action="#{nivelTituloController.guardarNivelTitulo()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:tabInfo"/> 
+                            <p:commandButton value="Guardar"  id="btnActualizar" icon="ui-icon-pencil" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:tabInfo"
+                                             rendered="#{nivelTituloController.editar and (nivelTituloController.ingresaDatos) }" title="Actualizar"    
+                                             actionListener="#{nivelTituloController.editarNivelTitulo()}" /> 
+                            <p:commandButton value="Cerrar" icon="ui-icon-circle-close" onclick="dlgDialog.hide()" process="@this"/>
+                        </f:facet>
+                    </h:panelGrid>
+                </p:dialog>
+                <p:dialog header="Pegrunta" widgetVar="dlgPregunta" modal="true" resizable="false"
+                          draggable="false" position="center">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="¿Esta seguro que desea eliminar el nivel?" class="label_negrilla"/>
+                        <h:outputText value="* Recuerde que este nivel puede estar enlazada con algunas funciones del sistema."/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="SI" icon="ui-icon-circle-check" actionListener="#{nivelTituloController.eliminarNivelTitulo()}"
+                                             update=":frmListado:tabInfo,:frmListado:tabInfo:msgListados"/>
+                            <p:commandButton value="NO" icon="ui-icon-circle-close" onclick="dlgPregunta.hide()" process="@this"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+
+    </ui:composition>
+</html>
+

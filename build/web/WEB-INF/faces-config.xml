@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!-- =========== FULL CONFIGURATION FILE ================================== -->
+
+<faces-config version="2.0"
+              xmlns="http://java.sun.com/xml/ns/javaee" 
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+              xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd">
+    <lifecycle>
+        <phase-listener>
+            configuracion.FaseListener
+        </phase-listener>
+    </lifecycle>
+    <application>
+        <resource-bundle>
+            <base-name>/configuracion/sade_config</base-name>
+            <var>configuracion</var>
+        </resource-bundle>
+        <resource-bundle>
+            <base-name>/configuracion/mensajesSeguridad</base-name>
+            <var>seguridad</var>
+        </resource-bundle>
+        <resource-bundle>
+            <base-name>/configuracion/mensajesInformacion</base-name>
+            <var>informacion</var>
+        </resource-bundle>
+         <resource-bundle>
+            <base-name>/configuracion/mensajesPuesto</base-name>
+            <var>puesto</var>
+        </resource-bundle>
+         <resource-bundle>
+            <base-name>/configuracion/mensajesControl</base-name>
+            <var>control</var>
+        </resource-bundle>
+        <resource-bundle>
+            <base-name>/configuracion/mensajesGenerales</base-name>
+            <var>mensajes</var>
+        </resource-bundle>
+    </application>
+</faces-config>

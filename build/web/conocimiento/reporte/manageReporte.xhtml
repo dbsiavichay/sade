@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            Administración de Reportes
+        </ui:define>
+        <ui:define name="listados">
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">                
+                <p:growl id="mensajes"/>                                   
+                <p:panel header="Administración de Reportes"> 
+                    <p:panel id="pnlListado" header="Reportes disponibles" style="display: inline-block; width: 38%;vertical-align: top; margin-right: 5px">
+                        <h:panelGrid columns="3">
+                            <h:outputLabel value="Paquete:" for="cboProceso" styleClass="label_negrilla"/>
+                            <p:selectOneMenu value="#{reporteController.procesoSeleccionado}" filter="true" filterMatchMode="contains">                            
+                                <p:ajax listener="#{reporteController.cambiarListaReportes()}" update=":frmListado:mensajes,:frmListado:pnlListado" />
+                                <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                                <f:selectItems value="#{procesoController.procesos}" var="proceso" itemLabel="#{proceso.codigo}, #{proceso.descripcion}" itemValue="#{proceso.id}"/>                                                            
+                            </p:selectOneMenu>                            
+                        </h:panelGrid>
+                        <p:separator/>
+                        <p:selectOneListbox id="lstReportes" style="height: 300px; width: 100%" valueChangeListener="#{reporteController.preparaVer}">                            
+                            <f:selectItems value="#{reporteController.reportes}" var="reporte" itemLabel="#{reporte.proceso.codigo} - #{reporte.docente.cedula}, #{reporte.docente.nombreCompleto}" itemValue="#{reporte.id}" />                            
+                            <p:ajax listener="#{detalleController.cambiarListaDetalles()}" update=":frmListado:mensajes,:frmListado:pnlDatos"/>                           
+                        </p:selectOneListbox>
+                    </p:panel>
+                    <p:panel id="pnlDatos" header="Datos de reporte" style="display: inline-block; width: 58%;vertical-align: top">                                                                        
+                        <h:panelGrid columns="2" columnClasses="columna_derecha,columna_izquierda"
+                                     style="margin-bottom: 5px">
+                            <h:outputLabel value="Paquete" for="cboProceso" class="label_negrilla"/>
+                            <p:inputText id="txtProceso" value="#{reporteController.reporteActual.proceso.codigo}, #{reporteController.reporteActual.proceso.descripcion}"  
+                                         size="50" readonly="true"/>                            
+
+                            <h:outputLabel value="Docente" for="cboDocente" class="label_negrilla" />
+                            <p:inputText id="txtDocente" value="#{reporteController.reporteActual.docente.cedula}, #{reporteController.reporteActual.docente.nombreCompleto}"
+                                         size="50" readonly="true"/>
+
+                            <h:outputLabel value="Url pdf ->" for="txtUrl" class="label_negrilla" rendered="#{reporteController.reporteActual.url!=null}"/>
+                            <h:outputLink target="_blank" value="../../#{reporteController.reporteActual.url}"
+                                          rendered="#{reporteController.reporteActual.url!=null}">Ir al reporte</h:outputLink>                            
+                        </h:panelGrid>
+                        <p:dataList value="#{detalleController.detalles}" var="detalle" type="ordered">
+                            <f:facet name="header">
+                                Resultados de reporte
+                            </f:facet>
+                            <b>#{detalle.valor},</b> #{detalle.materia.nombreMateria}
+                        </p:dataList>
+                        <f:facet name="footer">                            
+                            <p:commandButton id="btnEliminar" value="Eliminar" icon="ui-icon-circle-close"  title="Eliminar reporte" oncomplete="dlgPregunta.show()"
+                                             rendered="#{usuariosDataManager.funcionActual.eliminar}" disabled="#{reporteController.reporteActual==null}"/>                                                            
+                        </f:facet>
+                    </p:panel>                    
+                </p:panel>                
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos"> 
+                <p:dialog header="Mensaje" widgetVar="dlgPregunta" modal="true" resizable="false"
+                          draggable="false" position="center">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="¿Seguro desea eliminar este registro?" class="label_negrilla"/>
+                        <h:outputText value="* Recuerde que este registro puede estas enlazado con algunas funciones del sistema."/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="SI" icon="ui-icon-circle-check" actionListener="#{reporteController.eliminarReporte()}"
+                                             update=":frmListado:mensajes,:frmListado:pnlListado,:frmListado:pnlDatos" process="@this">
+                                <f:setPropertyActionListener value="#{null}" target="#{detalleController.detalles}"/>
+                            </p:commandButton>
+                            <p:commandButton value="NO" icon="ui-icon-circle-close" onclick="dlgPregunta.hide()" process="@this"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>               
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

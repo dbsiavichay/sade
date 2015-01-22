@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            Administración de Materias de Paquetes
+        </ui:define>
+        <ui:define name="listados">
+
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+
+                <p:panel id="pnlListado" header="Administración de Materias de Paquetes">
+                    <p:messages id="msgListados"/>                                                                     
+                    <p:panel style="width: 100%" >
+                        <h:outputLabel value="Paquetes:" class="label_negrilla" style="display: inline-block; vertical-align: top; margin-top: 4px"/>                        
+                        <p:selectOneMenu  id="cboProceso" value="#{materiaProcesoController.procesoSeleccionado}" style="display: inline-block;width: 25%; text-align: left;margin: 0 5px">     
+                            <f:selectItem itemLabel="Seleccionar" itemValue="" />  
+                            <f:selectItems value="#{procesoController.procesos}" var="proceso" itemLabel="#{proceso.codigo} - #{proceso.descripcion}" itemValue="#{proceso.id}"/>                                
+                            <p:ajax listener="#{materiaProcesoController.cambiarListaMateriasProceso()}" update=":frmDialogos:mensajes, :frmListado:pnlListado"/>
+                        </p:selectOneMenu>
+                    </p:panel>                        
+                    <p:separator id="separator"/>
+                    <h:panelGrid columns="4" class="columna_izquierda">                                            
+                        <h:outputLabel value="Agregar materias" class="label_negrilla"/>
+                        <p:selectOneMenu  id="cboCarreras" value="#{materiaProcesoController.carreraSeleccionada}" style="width: 200px"
+                                          disabled="#{materiaProcesoController.procesoSeleccionado==null}">     
+                            <f:selectItem itemLabel="Carrera" itemValue="" />  
+                            <f:selectItems value="#{materiaProcesoController.carreras}" var="carrera" itemLabel="#{carrera.nombre}" itemValue="#{carrera.codigo}"/>                        
+                            <p:ajax listener="#{materiaProcesoController.cambiarListaMateriasCarrera()}" update=":frmDialogos:mensajes, cboMateria"/>
+                        </p:selectOneMenu>
+                        <p:selectCheckboxMenu id="cboMateria" label="Materias" value="#{materiaProcesoController.materiasSeleccionadas}" style="width: 200px"
+                                              filter="true" filterMatchMode="contains" disabled="#{materiaProcesoController.procesoSeleccionado==null}">
+                            <f:selectItems value="#{materiaProcesoController.materiasCarrera}" var="materia" itemLabel="#{materia.nombreMateria}" itemValue="#{materia.id}"/>
+                        </p:selectCheckboxMenu>
+                        <p:commandButton id="btnGuardar" icon="ui-icon-disk" title="Guardar" disabled="#{materiaProcesoController.procesoSeleccionado==null}"
+                                         actionListener="#{materiaProcesoController.guardarMateriaProceso()}" update=":frmListado:pnlListado,:frmDialogos:mensajes"/>                            
+                    </h:panelGrid>
+                    <p:dataTable id="tblMaterias" var="materia"  value="#{materiaProcesoController.materias}" filteredValue="#{materiaProcesoController.materiasFiltrado}" 
+                                 paginator="#{materiaProcesoController.materias.size()>10}" rows="10" emptyMessage="#{mensajes.sinDatos}" >                            
+
+                        <p:column sortBy="#{materia.codigoCarrera} - #{materia.nombreCarrera}" headerText="CARRERA"  filterBy="#{materia.codigoCarrera} - #{materia.nombreCarrera}"  filterMatchMode="contains">
+                            #{materia.codigoCarrera} - #{materia.nombreCarrera}
+                        </p:column>     
+
+                        <p:column sortBy="#{materia.codigoMateria}" headerText="COD MATERIA"  filterBy="#{materia.codigoMateria}"  filterMatchMode="contains">
+                            #{materia.codigoMateria}  
+                        </p:column>      
+
+                        <p:column sortBy="#{materia.nombreMateria}" headerText="MATERIA"  filterBy="#{materia.nombreMateria}"  filterMatchMode="contains">
+                            #{materia.nombreMateria}  
+                        </p:column>      
+
+                        <p:column>                            
+                            <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar" oncomplete="dlgPregunta.show()"
+                                             rendered="#{usuariosDataManager.funcionActual.eliminar}">
+                                <f:setPropertyActionListener value="#{materia.id}" target="#{materiaProcesoController.materiaEliminada}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>                    
+                </p:panel>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos">
+                <p:growl id="mensajes"/>                
+                <p:dialog header="Pregunta" widgetVar="dlgPregunta" modal="true" resizable="false"
+                          draggable="false" position="center">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="¿Esta seguro que desea eliminar este registro.?" class="label_negrilla"/>
+                        <h:outputText value="* Recuerde que este registro puede estar enlazada con algunas funciones del sistema."/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="SI" icon="ui-icon-circle-check" actionListener="#{materiaProcesoController.eliminarMateriaProceso()}"
+                                             update=":frmListado:pnlListado,:frmDialogos:mensajes" process="@this"/>
+                            <p:commandButton value="NO" icon="ui-icon-circle-close" onclick="dlgPregunta.hide()" process="@this"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+
+    </ui:composition>
+</html>

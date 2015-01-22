@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="evaluacionPerfilReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b050fc0e-60ca-4a26-b28d-da8d90239c1c">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="RESULTADOS" class="net.sf.jasperreports.engine.JRDataSource"/>
+	<parameter name="CEDULA" class="java.lang.String"/>
+	<parameter name="NOMBRE_COMPLETO" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String"/>
+	<parameter name="PATH_LOGO" class="java.lang.String"/>
+	<field name="categoria" class="java.lang.String"/>
+	<field name="titulo" class="java.lang.String"/>
+	<field name="registro" class="java.lang.String"/>
+	<group name="CATEGORIA_GROUP">
+		<groupExpression><![CDATA[$F{categoria}]]></groupExpression>
+		<groupHeader>
+			<band height="40">
+				<rectangle>
+					<reportElement uuid="28c2e720-6910-4861-b775-167a7e945b27" x="0" y="0" width="555" height="20" forecolor="#9999FF" backcolor="#006699"/>
+				</rectangle>
+				<textField>
+					<reportElement uuid="bb19ba25-3c7e-4544-bc98-486396870ab2" x="0" y="0" width="187" height="20" forecolor="#FFFFFF"/>
+					<textElement>
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{categoria}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="316b087e-597e-451e-8aa3-16f095b388f6" x="0" y="20" width="377" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Título académico]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="789cf8d0-bff3-4bde-801f-dc9b9739975c" x="377" y="20" width="178" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Num. de registro]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="72">
+			<frame>
+				<reportElement uuid="86320a7b-6139-4419-9573-35c1314bc56b" mode="Opaque" x="-20" y="-20" width="595" height="92" backcolor="#006699"/>
+				<staticText>
+					<reportElement uuid="282f3fd5-e55a-4cff-af42-86d87ff86a4b" x="20" y="2" width="234" height="43" forecolor="#FFFFFF"/>
+					<textElement>
+						<font size="34" isBold="true"/>
+					</textElement>
+					<text><![CDATA[SADE]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="76cf8dc3-37ad-402c-96b9-d580891ae10b" x="151" y="68" width="293" height="20" forecolor="#FFFFFF"/>
+					<textElement textAlignment="Center">
+						<font size="14" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Evaluación de perfil académico]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="3a0f5648-1bd0-437f-bb19-44e1e5be24c4" x="20" y="39" width="293" height="20" forecolor="#FFFFFF"/>
+					<textElement>
+						<font size="14" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Sistema de Asignación de Docentes Espoch]]></text>
+				</staticText>
+				<image>
+					<reportElement uuid="6803a32f-6489-4fe4-ac4f-66046653307d" x="495" y="7" width="76" height="73"/>
+					<imageExpression><![CDATA[$P{PATH_LOGO}]]></imageExpression>
+				</image>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="48">
+			<staticText>
+				<reportElement uuid="36b4ea43-86d6-4d19-96bf-f1830f41ceac" x="0" y="3" width="84" height="20"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CÉDULA:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f325e0e2-2b39-4107-9d57-015c28605d25" x="0" y="23" width="84" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NOMBRE:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="a3fd7f78-ae81-4615-aaed-d7a877bd1000" x="84" y="3" width="201" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{CEDULA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7facba5e-378c-4b12-9bc3-de1d2d65fa26" x="84" y="23" width="471" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{NOMBRE_COMPLETO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20">
+			<rectangle>
+				<reportElement uuid="865acef4-2845-43f7-98d4-08cd7321d8db" x="0" y="0" width="555" height="20" forecolor="#9999FF" backcolor="#006699"/>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="912f85e9-7ac1-47af-b22f-310ea2af8018" x="209" y="0" width="137" height="20" forecolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PERFIL ACADEMICO]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15">
+			<textField>
+				<reportElement uuid="4432066e-c63b-4001-99df-71ef5b683b3f" x="377" y="0" width="178" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{registro}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a96be4b8-6fd6-49ba-b416-42b4b307eea6" x="0" y="0" width="377" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{titulo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="40">
+			<textField>
+				<reportElement uuid="bd4e123d-0a3b-4ca7-95a7-0ca41023bb1b" mode="Opaque" x="0" y="24" width="515" height="13" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Página "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="c3ebfc55-2a71-4437-b761-8e6d24ab3b59" mode="Opaque" x="515" y="24" width="40" height="13" backcolor="#E6E6E6"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="9dcdd83c-69fa-4db3-9911-de54320d20bf" x="0" y="24" width="100" height="13"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="015846be-00ec-4482-99d9-8622c53737a8" x="152" y="0" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Desarrolladores:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b18d3544-245d-41cd-a8ba-c6ccb38f8917" x="244" y="0" width="140" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Denis Siavichay y Luis Parra]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="100">
+			<rectangle>
+				<reportElement uuid="57992cb7-0025-4676-982c-276c8ffbee16" x="0" y="0" width="555" height="20" forecolor="#9999FF" backcolor="#006699"/>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="67a29117-03ba-4d63-a51f-1f06c6b6a80f" x="227" y="0" width="100" height="20" forecolor="#FFFFFF" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RESULTADOS]]></text>
+			</staticText>
+			<subreport>
+				<reportElement uuid="c64b61f9-5737-4a9b-85c8-71e48bea1c30" x="0" y="25" width="555" height="75"/>
+				<dataSourceExpression><![CDATA[$P{RESULTADOS}]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "evaluacionResultados.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
+</jasperReport>

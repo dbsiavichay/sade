@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            Administración de Roles
+        </ui:define>
+        <ui:define name="listados">
+
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+                <p:panel id="pnlListado" header="Administración de roles">
+                    <p:messages id="msgListados"/>
+                    <p:commandButton id="btnNuevo" value="Nuevo" icon="ui-icon-circle-plus"  title="Nuevo" 
+                                     actionListener="#{rolController.preparaNuevo()}"  oncomplete="dlgDialog.show()" 
+                                     rendered="#{usuariosDataManager.funcionActual.agregar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" />
+                    <p:separator id="separator"/> 
+                    <p:dataTable id="tblRoles" var="rol"  value="#{rolController.roles}" filteredValue="#{rolController.rolesFiltro}" 
+                                 paginator="#{rolController.roles.size()>10}" rows="10" emptyMessage="#{mensajes.sinDatos}" >                            
+                        <p:column sortBy="#{rol.codigo}" headerText="CODIGO"  filterBy="#{rol.codigo}"  filterMatchMode="contains">
+                            #{rol.codigo}
+                        </p:column>
+                        <p:column sortBy="#{rol.nombre}" headerText="NOMBRE"  filterBy="#{rol.nombre}"  filterMatchMode="contains">
+                            #{rol.nombre}
+                        </p:column>
+                        <p:column headerText="ACTIVO">                                
+                            #{rol.activo?"SI":"NO"}
+                        </p:column>                            
+                        <p:column>
+                            <p:commandButton id="btnVer" icon="ui-icon-search" title="Ver" oncomplete="dlgDialog.show()" 
+                                             action="#{rolController.preparaVer()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" >
+                                <f:setPropertyActionListener value="#{rol}" target="#{rolController.rolActual}"/>                                    
+                            </p:commandButton>
+                            <p:commandButton id="btnEditar" icon="ui-icon-pencil"  title="Editar" oncomplete="dlgDialog.show()"
+                                             action="#{rolController.preparaEditar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes"
+                                             rendered="#{usuariosDataManager.funcionActual.editar}" >
+                                <f:setPropertyActionListener value="#{rol}" target="#{rolController.rolActual}"/>
+
+                            </p:commandButton>
+                            <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar" oncomplete="dlgPregunta.show()"
+                                             update=":frmDialogos:pnlDatos" rendered="#{usuariosDataManager.funcionActual.eliminar}">
+                                <f:setPropertyActionListener value="#{rol}" target="#{rolController.rolActual}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>                    
+                </p:panel>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos">
+                <p:dialog header="Datos de Rol" widgetVar="dlgDialog" modal="true" resizable="false"
+                          draggable="true" position="center" width="700">
+                    <p:growl id="mensajes"/>
+                    <h:panelGrid id="pnlDatos" columns="3" columnClasses="columna_derecha,columna_izquierda" >
+                        
+                         <h:outputLabel value="Código" for="txtCodigo" class="label_negrilla"/>
+                         <p:inputText id="txtCodigo" value="#{rolController.rolActual.codigo}" title="Código del rol" 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="25" disabled="#{not rolController.ingresaDatos}"/>
+                        <p:message for="txtCodigo" />
+                        
+                        <h:outputLabel value="Nombre" for="txtNombre" class="label_negrilla"/>
+                        <p:inputText id="txtNombre" value="#{rolController.rolActual.nombre}" title="Nombre del rol" 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="35" disabled="#{not rolController.ingresaDatos}"/>
+                        <p:message for="txtNombre" />
+                        
+                        <h:outputLabel value="Activo" for="chkActivo" class="label_negrilla"/>
+                        <p:selectBooleanCheckbox id="chkActivo" value="#{rolController.rolActual.activo}" 
+                                     disabled="#{not rolController.ingresaDatos}"/>
+                        <p:message for="chkActivo" />                                           
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Guardar"  id="btnGuardar" icon="ui-icon-circle-check" 
+                                             rendered="#{rolController.nuevo and rolController.ingresaDatos}" title="Guardar" 
+                                             action="#{rolController.guardarRol()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"/> 
+                            <p:commandButton value="Guardar"  id="btnActualizar" icon="ui-icon-pencil" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"
+                                             rendered="#{rolController.editar and (rolController.ingresaDatos) }" title="Actualizar"    
+                                             actionListener="#{rolController.editarRol()}" /> 
+                            <p:commandButton value="Cerrar" icon="ui-icon-circle-close" onclick="dlgDialog.hide()" process="@this"/>
+                        </f:facet>
+                    </h:panelGrid>
+                </p:dialog>
+                <p:dialog header="Pegrunta" widgetVar="dlgPregunta" modal="true" resizable="false"
+                          draggable="false" position="center">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="¿Esta seguro que desea eliminar este registro.?" class="label_negrilla"/>
+                        <h:outputText value="* Recuerde que este registro puede estar enlazada con algunas funciones del sistema."/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="SI" icon="ui-icon-circle-check" actionListener="#{rolController.eliminarRol()}"
+                                             update=":frmListado:pnlListado,:frmDialogos:mensajes" process="@this"/>
+                            <p:commandButton value="NO" icon="ui-icon-circle-close" onclick="dlgPregunta.hide()" process="@this"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

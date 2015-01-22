@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            Clasificación de Materias
+        </ui:define>
+        <ui:define name="listados">
+
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+                <p:panel id="pnlListado" header="Clasificación de Materias" style="overflow: hidden">
+                    <p:messages id="msgListados"/>                                                                     
+                    <p:panel id="pnlClasificados" header="Materias no clasificadas" style="width: 30%; display: inline-block" >
+                        <h:panelGrid columns="2" class="columna_derecha,columna_izquierda">
+                            <h:outputLabel value="Selecionar" class="label_negrilla"/>
+                            <p:selectOneMenu  id="cboCarreras" value="#{materiaCampoDetalladoController.carreraSeleccionada}" style="width: 200px">     
+                                <f:selectItem itemLabel="Carrera" itemValue="" />  
+                                <f:selectItems value="#{materiaCampoDetalladoController.carreras}" var="carrera" itemLabel="#{carrera.nombre}" itemValue="#{carrera.codigo}"/>                        
+                                <p:ajax listener="#{materiaCampoDetalladoController.cambiarListaMateriasCarrera()}" update=":frmListado:msgListados, :frmListado:pnlClasificados"/>
+                            </p:selectOneMenu>
+                        </h:panelGrid>                                                                                                            
+                        <p:selectManyMenu id="cboMateria" label="Materias" value="#{materiaCampoDetalladoController.materiasSeleccionadas}" showCheckbox="true" style="width: 100%; height: 325px">
+                            <f:selectItems value="#{materiaCampoDetalladoController.materiasCarrera}" var="materia" itemLabel=" #{materia.codigoMateria}, #{materia.nombreMateria}" itemValue="#{materia.id}"/>
+                        </p:selectManyMenu>
+                        <h:outputLabel value="#{materiaCampoDetalladoController.materiasCarrera.size()} items disponibles." class="label_negrilla" style="display: block"/>
+                        <p:commandButton id="btnGuardar" value="Clasificar" icon="ui-icon-circle-arrow-e" title="Guardar" style="margin-top: 10px"
+                                         actionListener="#{materiaCampoDetalladoController.guardarMateriaCampoDetallado()}" update=":frmListado:pnlListado"/>                            
+                    </p:panel>                               
+                    <p:panel id="pnlNoClasificados" header="Materias clasificadas" style="width: 68%; float: right">
+                        <h:outputLabel value="Filtrar por:" class="label_negrilla" style="display: inline-block; vertical-align: top; margin-top: 4px"/>
+                        <p:selectOneMenu  id="cboCampoAmplio" value="#{materiaCampoDetalladoController.campoAmplioSeleccionado}" style="display: inline-block;width: 25%; text-align: left;margin: 0 5px">     
+                            <f:selectItem itemLabel="Campo Amplio" itemValue="" />  
+                            <f:selectItems value="#{campoAmplioController.camposAmplios}" var="campoAmplio" itemLabel="#{campoAmplio.nombre}" itemValue="#{campoAmplio.id}"/>
+                            <p:ajax listener="#{materiaCampoDetalladoController.cambiarListaCamposEspecificos()}" update=":frmListado:msgListados, tblMaterias,cboCampoEspecifico, cboCampoDetallado"/>
+                        </p:selectOneMenu>
+                        <p:selectOneMenu  id="cboCampoEspecifico" value="#{materiaCampoDetalladoController.campoEspecificoSeleccionado}" style="display: inline-block;width: 25%; text-align: left;margin: 0 5px">     
+                            <f:selectItem itemLabel="Campo Especifico" itemValue="" />  
+                            <f:selectItems value="#{materiaCampoDetalladoController.camposEspecificos}" var="campoEspecifico" itemLabel="#{campoEspecifico.nombre}" itemValue="#{campoEspecifico.id}"/>
+                            <p:ajax listener="#{materiaCampoDetalladoController.cambiarListaCamposDetallados()}" update=":frmListado:msgListados, tblMaterias,cboCampoDetallado"/>
+                        </p:selectOneMenu>
+                        <p:selectOneMenu  id="cboCampoDetallado" value="#{materiaCampoDetalladoController.campoDetalladoSeleccionado}" style="display: inline-block;width: 25%; text-align: left;margin: 0 5px">     
+                            <f:selectItem itemLabel="Campo Detallado" itemValue="" />  
+                            <f:selectItems value="#{materiaCampoDetalladoController.camposDetallados}" var="campoDetallado" itemLabel="#{campoDetallado.nombre}" itemValue="#{campoDetallado.id}"/>                                
+                            <p:ajax listener="#{materiaCampoDetalladoController.cambiarListaMateriaCampoDetallados()}" update=":frmListado:msgListados, tblMaterias"/>
+                        </p:selectOneMenu>
+                        <p:separator/>
+                        <p:dataTable id="tblMaterias" var="materia"  value="#{materiaCampoDetalladoController.materias}" filteredValue="#{materiaCampoDetalladoController.materiasFiltrado}" 
+                                     paginator="#{materiaCampoDetalladoController.materias.size()>6}" rows="6" emptyMessage="#{mensajes.sinDatos}" >                            
+
+                            <p:column sortBy="#{materia.materia.codigoCarrera}, #{materia.materia.nombreCarrera}" headerText="CARRERA"  filterBy="#{materia.materia.codigoCarrera}, #{materia.materia.nombreCarrera}"  filterMatchMode="contains">
+                                #{materia.materia.codigoCarrera}, #{materia.materia.nombreCarrera}
+                            </p:column>                                 
+
+                            <p:column sortBy="#{materia.materia.codigoMateria}, #{materia.materia.nombreMateria}" headerText="MATERIA"  filterBy="#{materia.materia.codigoMateria}, #{materia.materia.nombreMateria}"  filterMatchMode="contains">
+                                #{materia.materia.codigoMateria}, #{materia.materia.nombreMateria}
+                            </p:column>      
+
+                            <p:column>                            
+                                <p:commandButton id="btnEditar" icon="ui-icon-carat-2-n-s"  title="Editar" oncomplete="dlgDialog.show()"
+                                                 rendered="#{usuariosDataManager.funcionActual.editar}" update=":frmDialogos:mensajes,:frmDialogos:pnlDatos">
+                                    <f:setPropertyActionListener value="#{materia}" target="#{materiaCampoDetalladoController.materiaCampoDetalladoSeleccionado}"/>
+                                    <f:setPropertyActionListener value="#{null}" target="#{campoEspecificoController.campoAmplioSeleccionado}"/>
+                                    <f:setPropertyActionListener value="#{null}" target="#{campoDetalladoController.campoEspecificoSeleccionado}"/>
+                                    <f:setPropertyActionListener value="#{null}" target="#{campoEspecificoController.camposEspecificos}"/>
+                                    <f:setPropertyActionListener value="#{null}" target="#{campoDetalladoController.camposDetallados}"/>
+                                </p:commandButton>
+                                <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar" oncomplete="dlgPregunta.show()"
+                                                 rendered="#{usuariosDataManager.funcionActual.eliminar}">
+                                    <f:setPropertyActionListener value="#{materia}" target="#{materiaCampoDetalladoController.materiaCampoDetalladoSeleccionado}"/>
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>                                                                                                       
+                </p:panel>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos">
+                <p:growl id="mensajes"/>                              
+                <p:dialog header="Datos de Materia" widgetVar="dlgDialog" modal="true" resizable="false"
+                          draggable="true" position="center" width="700">                    
+                    <h:panelGrid id="pnlDatos" columns="3" columnClasses="columna_derecha,columna_izquierda" >                                                                                                
+                        <h:outputLabel value="Seleccionar" class="label_negrilla"/>
+                        <p:selectOneMenu  id="cboCampoAmplio" value="#{campoEspecificoController.campoAmplioSeleccionado}"
+                                          required="true" requiredMessage="Este campo es obligatorio">     
+                            <f:selectItem itemLabel="Campo Amplio" itemValue="" />  
+                            <f:selectItems value="#{campoAmplioController.camposAmplios}" var="campoAmplio" itemLabel="#{campoAmplio.nombre}" itemValue="#{campoAmplio.id}"/>
+                            <p:ajax listener="#{campoEspecificoController.cambiarListaCamposEspecificos()}" update=":frmDialogos:mensajes, cboCampoEspecifico, cboCampoDetallado"/>
+                        </p:selectOneMenu>
+                        <p:message for="cboCampoAmplio"/>                        
+                        
+                        <h:outputLabel value="Campo Especifico" class="label_negrilla"/>
+                        <p:selectOneMenu  id="cboCampoEspecifico" value="#{campoDetalladoController.campoEspecificoSeleccionado}"
+                                          required="true" requiredMessage="Este campo es obligatorio">     
+                            <f:selectItem itemLabel="Seleccionar" itemValue="" />  
+                            <f:selectItems value="#{campoEspecificoController.camposEspecificos}" var="campoEspecifico" itemLabel="#{campoEspecifico.nombre}" itemValue="#{campoEspecifico.id}"/>
+                            <p:ajax listener="#{campoDetalladoController.cambiarListaCamposDetallados()}" update=":frmDialogos:mensajes, cboCampoDetallado"/>
+                        </p:selectOneMenu>
+                        <p:message for="cboCampoEspecifico" />                        
+                        
+                        <h:outputLabel value="Campo Detallado" class="label_negrilla"/>
+                        <p:selectOneMenu  id="cboCampoDetallado" value="#{materiaCampoDetalladoController.materiaCampoDetalladoSeleccionado.idCampoDetallado}"
+                                          required="true" requiredMessage="Este campo es obligatorio">     
+                            <f:selectItem itemLabel="Campo Detallado" itemValue="" />  
+                            <f:selectItems value="#{campoDetalladoController.camposDetallados}" var="campoDetallado" itemLabel="#{campoDetallado.nombre}" itemValue="#{campoDetallado.id}"/>                                                            
+                        </p:selectOneMenu>
+                        <p:message for="cboCampoDetallado" />                        
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Aceptar"  id="btnGuardar" icon="ui-icon-circle-check"  title="Guardar" 
+                                             action="#{materiaCampoDetalladoController.editarMateriaCampoDetallado()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"/>                             
+                            <p:commandButton value="Cerrar" icon="ui-icon-circle-close" onclick="dlgDialog.hide()" process="@this"/>
+                        </f:facet>
+                    </h:panelGrid>
+                </p:dialog>
+
+                <p:dialog header="Pregunta" widgetVar="dlgPregunta" modal="true" resizable="false"
+                          draggable="false" position="center">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="¿Esta seguro que desea eliminar este registro.?" class="label_negrilla"/>
+                        <h:outputText value="* Recuerde que este registro puede estar enlazada con algunas funciones del sistema."/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="SI" icon="ui-icon-circle-check" actionListener="#{materiaCampoDetalladoController.eliminarMateriaCampoDetallado()}"
+                                             update=":frmListado:pnlClasificados,:frmListado:pnlNoClasificados,:frmDialogos:mensajes" process="@this"/>
+                            <p:commandButton value="NO" icon="ui-icon-circle-close" onclick="dlgPregunta.hide()" process="@this"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+
+    </ui:composition>
+</html>

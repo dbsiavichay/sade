@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            Administración de Titulos
+        </ui:define>
+        <ui:define name="listados">
+
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+
+                <p:panel id="pnlListado" header="Administración de Títulos">
+                    <p:messages id="msgListados"/>
+
+                    <p:commandButton id="btnNuevo" value="Nuevo" icon="ui-icon-circle-plus"  title="Nuevo" 
+                                     actionListener="#{tituloController.preparaNuevo()}"  oncomplete="dlgDialog.show()" 
+                                     rendered="#{usuariosDataManager.funcionActual.agregar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" />
+                    <p:separator id="separator"/> 
+
+                    <h:panelGrid columns="3" columnClasses="columna_izquierda"  >
+                        <h:outputLabel value="Docente: " class="label_negrilla" />
+                        <p:selectOneMenu  id="cboDocente" value="#{tituloController.docenteSeleccionado}" filter="true" filterMatchMode="contains">     
+                            <f:selectItem itemLabel="Seleccionar" itemValue="" />  
+                            <f:selectItems value="#{usuarioController.usuarios}" var="usuario" itemLabel="#{usuario.cedula} - #{usuario.nombreCompleto}" itemValue="#{usuario.id}"/>
+                        </p:selectOneMenu>
+                        <p:commandButton id="btnActualizar" icon="ui-icon-refresh" title="Actualizar"
+                                         actionListener="#{tituloController.cambiarListaTitulos}" update=":frmListado:pnlListado,:frmDialogos:mensajes">
+                        </p:commandButton>
+                    </h:panelGrid>  
+
+                    <p:dataTable id="tblTitulos" var="titulo"  value="#{tituloController.titulos}" filteredValue="#{tituloController.titulosFiltro}" 
+                                 paginator="#{tituloController.titulos.size()>10}" rows="10" emptyMessage="#{mensajes.sinDatos}" >                                                       
+                        <p:column sortBy="#{titulo.nombre}" headerText="TITULO"  filterBy="#{titulo.nombre}"  filterMatchMode="contains">
+                            #{titulo.nombre}
+                        </p:column>   
+                        <p:column sortBy="#{titulo.registro}" headerText="N° DE REGISTRO" filterBy="#{titulo.registro}"  filterMatchMode="contains">
+                            #{titulo.registro}
+                        </p:column>                              
+                        <p:column sortBy="#{titulo.urlDocumento}" headerText="DOCUMENTO" filterBy="#{titulo.urlDocumento}"  filterMatchMode="contains">
+                            <h:outputLink target="_blank" value="../../#{titulo.urlDocumento}" rendered="#{titulo.urlDocumento!=null}">
+                                Ir al pdf del título
+                            </h:outputLink>                                                        
+                            <h:outputLabel value="No hay pdf registrado" rendered="#{titulo.urlDocumento == null}"/>
+                        </p:column>                                                      
+                        <p:column>
+                            <p:commandButton id="btnVer" icon="ui-icon-search" title="Ver" oncomplete="dlgDialog.show()" 
+                                             action="#{tituloController.preparaVer()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" >
+                                <f:setPropertyActionListener value="#{titulo}" target="#{tituloController.tituloActual}"/>                                    
+                            </p:commandButton>
+                            <p:commandButton id="btnEditar"  icon="ui-icon-pencil"  title="Editar" oncomplete="dlgDialog.show()"  
+                                             action="#{tituloController.preparaEditar()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes"
+                                             rendered="#{usuariosDataManager.funcionActual.editar}" >
+                                <f:setPropertyActionListener value="#{titulo}" target="#{tituloController.tituloActual}"/>
+                            </p:commandButton>
+                            <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar" oncomplete="dlgPregunta.show()"
+                                             update=":frmDialogos:pnlDatos" rendered="#{usuariosDataManager.funcionActual.eliminar}">
+                                <f:setPropertyActionListener value="#{titulo}" target="#{tituloController.tituloActual}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>                    
+                </p:panel>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos">
+                <p:dialog header="Datos de Perfil" widgetVar="dlgDialog" modal="true" resizable="false"
+                          draggable="true" position="center" width="700">
+                    <p:growl id="mensajes"/>
+                    <h:panelGrid id="pnlDatos" columns="3" columnClasses="columna_derecha,columna_izquierda" >
+
+                        <h:outputLabel value="Docente" for="cboDocente" class="label_negrilla"/>
+                        <p:selectOneMenu  id="cboDocente" value="#{tituloController.tituloActual.idDocente}" required="true"
+                                          requiredMessage="Docente es necesario seleccionar" disabled="#{not tituloController.ingresaDatos}" filter="true" filterMatchMode="contains"> 
+                            <f:selectItem itemLabel="Seleccionar" itemValue="" />  
+                            <f:selectItems value="#{usuarioController.usuarios}" var="usuario" itemLabel="#{usuario.cedula} - #{usuario.nombreCompleto}" itemValue="#{usuario.id}"/>                           
+                        </p:selectOneMenu>                            
+                        <p:message for="cboDocente" />   
+                        
+                        <h:outputLabel value="Nivel" for="cboCategoria" class="label_negrilla"/>
+                        <p:selectOneMenu  id="cboCategoria" value="#{tituloController.tituloActual.idCategoria}" required="true"
+                                          requiredMessage="Nivel es necesario seleccionar" disabled="#{not tituloController.ingresaDatos}" filter="true" filterMatchMode="contains"> 
+                            <f:selectItem itemLabel="Seleccionar" itemValue="" />  
+                            <f:selectItems value="#{categoriaController.categorias}" var="categoria" itemLabel="#{categoria.nombre}" itemValue="#{categoria.id}"/>                           
+                        </p:selectOneMenu>                            
+                        <p:message for="cboCategoria" />                        
+
+                        <h:outputLabel value="Titulo" for="txtNombre" class="label_negrilla"/>
+                        <p:inputText id="txtNombre" value="#{tituloController.tituloActual.nombre}" title="Nombre del título" 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="50" disabled="#{not tituloController.ingresaDatos}"/>
+                        <p:message for="txtNombre" />                        
+
+                        <h:outputLabel value="N° de Registro" for="txtRegistro" class="label_negrilla"/>
+                        <p:inputText id="txtRegistro" value="#{tituloController.tituloActual.registro}" title="Nivel del título" 
+                                     size="25" disabled="#{not tituloController.ingresaDatos}"/>
+                        <p:message for="txtRegistro" />                          
+
+                        <h:outputLabel value="Archivo (PDF)" for="txtRegistro" class="label_negrilla"/>
+                        <h:panelGrid columns="1">                            
+                            <p:fileUpload id="fulDocumento" mode="advanced" allowTypes="/(\.|\/)(pdf)$/" sizeLimit="102400" rendered="#{tituloController.ingresaDatos}"
+                                      auto="true" label="Examinar" invalidFileMessage="Solo se acepta en formato pdf" invalidSizeMessage="El archivo debe tener máximo 100kb"                                      
+                                      fileUploadListener="#{tituloController.subirDocumento}" update="fileLabel"/>
+                            <h:outputLabel id="fileLabel" value="#{tituloController.documento.fileName}"/>                                                                               
+                            <a target="_blank" href="../../#{tituloController.tituloActual.urlDocumento}">Visualizar pdf del título</a>
+                        </h:panelGrid>                                                                        
+                        <h:outputLabel value=""/>
+                        
+                        <h:outputLabel value="Campos de pertenecia" for="cboCampoDetallado" class="label_negrilla"/>
+                        <p:selectCheckboxMenu id="cboCampoDetallado" label="Seleccionar" value="#{tituloController.camposSeleccionados}"
+                                              filter="true" filterMatchMode="contains" required="true" requiredMessage="Es necesario seleccionar al menos un campo">
+                            <f:selectItems value="#{campoDetalladoController.camposDetallados}" var="campo" itemLabel="#{campo.nombre}" itemValue="#{campo.id}"/>
+                        </p:selectCheckboxMenu>                            
+                        <p:message for="cboCampoDetallado" />                        
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Guardar"  id="btnGuardar" icon="ui-icon-circle-check" 
+                                             rendered="#{tituloController.nuevo and tituloController.ingresaDatos}" title="Guardar" 
+                                             action="#{tituloController.guardarTitulo}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"/> 
+                            <p:commandButton value="Guardar"  id="btnActualizar" icon="ui-icon-pencil" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"
+                                             rendered="#{tituloController.editar and (tituloController.ingresaDatos) }" title="Actualizar"    
+                                             actionListener="#{tituloController.editarTitulo}" /> 
+                            <p:commandButton value="Cerrar" icon="ui-icon-circle-close" onclick="dlgDialog.hide()" process="@this"/>
+                        </f:facet>
+                    </h:panelGrid>
+                </p:dialog>
+                <p:dialog header="Pregunta" widgetVar="dlgPregunta" modal="true" resizable="false"
+                          draggable="false" position="center">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="¿Esta seguro que desea eliminar este registro.?" class="label_negrilla"/>
+                        <h:outputText value="* Recuerde que este registro puede estar enlazada con algunas funciones del sistema."/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="SI" icon="ui-icon-circle-check" actionListener="#{tituloController.eliminarTitulo}"
+                                             update=":frmListado:pnlListado,:frmDialogos:mensajes" process="@this"/>
+                            <p:commandButton value="NO" icon="ui-icon-circle-close" onclick="dlgPregunta.hide()" process="@this"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>            
+        </ui:define>
+    </ui:composition>
+</html>

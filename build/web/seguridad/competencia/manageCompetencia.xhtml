@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui" 
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+
+        <ui:define name="tituloPagina">
+            Roles de usuario
+        </ui:define>
+
+        <ui:define name="listados">            
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+                <p:growl id="mensajes"/>
+                <p:panel id="pnlListado" header="Administración de competencias">
+                    <p:messages id="msgListados"/>                     
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Usuarios:" for="cboUsuario" styleClass="label_negrilla"/>
+                        <p:selectOneMenu id="cboUsuario" value="#{competenciaController.usuarioSeleccionado}"
+                                         filter="true" filterMatchMode="startsWith">
+                            <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                            <f:selectItems value="#{usuarioController.usuarios}" var="usuario" itemLabel="#{usuario.nombreCompleto}" itemValue="#{usuario.id}"/>                                   
+                        </p:selectOneMenu>
+                        <p:commandButton id="btnActualizar" icon="ui-icon-refresh" title="Actualizar"
+                                         action="#{competenciaController.cargarCompetencias()}" update=":frmListado:mensajes,:frmListado:pnlListado"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="3">
+                        <p:fieldset id="flsRoles" legend="Roles disponibles"> 
+                            <p:dataTable id="tblRoles" var="rol"  value="#{competenciaController.rolesDisponibles}" paginator="#{competenciaController.rolesDisponibles.size()>5}" 
+                                         rows="5" emptyMessage="#{seguridad.sinDatos}" >
+                                <p:column style="width:20px" rendered="#{usuariosDataManager.funcionActual.agregar}">  
+                                    <h:outputText id="dragIcon"  
+                                                  styleClass="ui-icon ui-icon-arrow-4" />  
+                                    <p:draggable for="dragIcon" revert="true"/>
+                                </p:column>                                                                  
+                                <p:column headerText="ROL">
+                                    #{rol.nombre}
+                                </p:column>                                                                                
+                            </p:dataTable>
+                        </p:fieldset>
+
+                        <p:fieldset id="flsCompetencias" legend="Roles seleccionados">  
+                            <p:outputPanel id="dropArea">  
+                                <h:outputText value="!!!Arrastre aquí!!!" rendered="#{empty competenciaController.competencias}"  
+                                              style="font-size:24px;" />  
+
+                                <p:dataTable var="competencia" value="#{competenciaController.competencias}" paginator="#{competenciaController.competencias.size()>5}" 
+                                             rows="5" rendered="#{not empty competenciaController.competencias}" editable="true" editMode="cell">                                      
+                                    <p:column headerText="ROL">
+                                        #{competencia.rol.nombre}
+                                    </p:column>
+                                    <p:column headerText="ACTIVO">
+                                        #{competencia.activo?"SI":"NO"}
+                                    </p:column>   
+
+                                    <p:column >  
+                                        <p:commandButton id="btnActivar" icon="ui-icon-circle-triangle-n"  title="Activar" process="@this"                                                        
+                                                         action="#{competenciaController.activarCompetencia()}" update=":frmListado:mensajes,:frmListado:pnlListado" rendered="#{usuariosDataManager.funcionActual.editar and not competencia.activo}">
+                                            <f:setPropertyActionListener value="#{competencia}" target="#{competenciaController.competenciaSeleccionado}"/>
+                                        </p:commandButton> 
+                                        <p:commandButton id="btnDeactivar" icon="ui-icon-circle-triangle-s"  title="Desactivar" process="@this"                                                        
+                                                         action="#{competenciaController.desactivarCompetencia()}" update=":frmListado:mensajes,:frmListado:pnlListado" rendered="#{usuariosDataManager.funcionActual.editar and competencia.activo}">
+                                            <f:setPropertyActionListener value="#{competencia}" target="#{competenciaController.competenciaSeleccionado}"/>
+                                        </p:commandButton> 
+                                        <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar" process="@this"                                                        
+                                                         action="#{competenciaController.eliminarCompetencia()}" update=":frmListado:mensajes,:frmListado:pnlListado" rendered="#{usuariosDataManager.funcionActual.eliminar}">
+                                            <f:setPropertyActionListener value="#{competencia}" target="#{competenciaController.competenciaSeleccionado}"/>
+                                        </p:commandButton>  
+                                    </p:column>  
+                                </p:dataTable>  
+                            </p:outputPanel>  
+                        </p:fieldset>  
+
+                        <p:droppable for="flsCompetencias" tolerance="touch" activeStyleClass="ui-state-highlight" datasource="tblRoles">  
+                            <p:ajax listener="#{competenciaController.agregarCompetencia}" update=":frmListado:mensajes,:frmListado:pnlListado" />  
+                        </p:droppable>                         
+                    </h:panelGrid>
+                    <p:commandButton value="Guardar"  icon="ui-icon-disk" style="width: 100px;height: 40px"
+                                     action="#{competenciaController.guardarCompetencias()}" update=":frmListado:mensajes,:frmListado:pnlListado"/>
+                </p:panel>
+            </h:form>
+        </ui:define>
+
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>          
+        </ui:define>
+    </ui:composition>
+</html>
+

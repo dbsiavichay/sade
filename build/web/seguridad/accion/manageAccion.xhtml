@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            Administración de Acciones
+        </ui:define>
+        <ui:define name="listados">
+
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+                <p:panel id="pnlListado" header="Administración de acciones">
+                    <p:messages id="msgListados"/>
+                    
+                        <p:commandButton id="btnNuevo" value="Nuevo" icon="ui-icon-circle-plus"  title="Nuevo" 
+                                         actionListener="#{accionController.preparaNuevo()}"  oncomplete="dlgDialog.show()" 
+                                         rendered="#{usuariosDataManager.funcionActual.agregar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" />
+                        <p:separator id="separator"/> 
+                        <p:dataTable id="tblAcciones" var="accion"  value="#{accionController.acciones}" filteredValue="#{accionController.accionesFiltro}" 
+                                     paginator="#{accionController.acciones.size()>10}" rows="10" emptyMessage="#{mensajes.sinDatos}" >                            
+                            <p:column sortBy="#{accion.nombre}" headerText="NOMBRE"  filterBy="#{accion.nombre}"  filterMatchMode="contains">
+                                #{accion.nombre}
+                            </p:column>
+                            <p:column headerText="URL" sortBy="#{accion.url}">
+                                #{accion.url}
+                            </p:column>
+                            <p:column headerText="ACTIVO">                                
+                                #{accion.activo ? "SI":"NO"}
+                            </p:column>                            
+                            <p:column>
+                                <p:commandButton id="btnVer" icon="ui-icon-search" title="Ver" oncomplete="dlgDialog.show()" 
+                                                 action="#{accionController.preparaVer()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" >
+                                    <f:setPropertyActionListener value="#{accion}" target="#{accionController.accionActual}"/>                                    
+                                </p:commandButton>
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil"  title="Editar" oncomplete="dlgDialog.show()"
+                                                 action="#{accionController.preparaEditar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes"
+                                                 rendered="#{usuariosDataManager.funcionActual.editar}" >
+                                    <f:setPropertyActionListener value="#{accion}" target="#{accionController.accionActual}"/>
+
+                                </p:commandButton>
+                                <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar" oncomplete="dlgPregunta.show()"
+                                                 update=":frmDialogos:pnlDatos" rendered="#{usuariosDataManager.funcionActual.eliminar}">
+                                    <f:setPropertyActionListener value="#{accion}" target="#{accionController.accionActual}"/>
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>                    
+                </p:panel>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos">
+                <p:dialog header="Datos de Accion" widgetVar="dlgDialog" modal="true" resizable="false"
+                          draggable="true" position="center" width="700">
+                    <p:growl id="mensajes"/>
+                    <h:panelGrid id="pnlDatos" columns="3" columnClasses="columna_derecha,columna_izquierda" >
+                        <h:outputLabel value="Nombre" for="txtNombre" class="label_negrilla"/>
+                        <p:inputText id="txtNombre" value="#{accionController.accionActual.nombre}" title="Nombre del accion" 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="25" disabled="#{not accionController.ingresaDatos}"/>
+                        <p:message for="txtNombre" />
+
+                        <h:outputLabel value="Url" for="cboUrl" class="label_negrilla" />
+                        <p:selectOneMenu  id="cboUrl" value="#{accionController.accionActual.url}" required="true" 
+                                          requiredMessage="Este campo es obligatorio." disabled="#{not accionController.ingresaDatos}">
+                            <f:selectItem itemLabel="Seleccione una página" itemValue="" />  
+                            <f:selectItems value="#{accionController.listaPaginas}" var="str" itemValue="#{str}"/>
+                        </p:selectOneMenu>
+                        <p:message for="cboUrl" />
+
+                        <h:outputLabel value="Activo" for="chkActivo" class="label_negrilla"/>
+                        <p:selectBooleanCheckbox id="chkActivo" value="#{accionController.accionActual.activo}" disabled="#{not accionController.ingresaDatos}" />
+                        <h:outputLabel value=""/>
+                                                
+                        <f:facet name="footer">
+                            <p:commandButton value="Guardar"  id="btnGuardar" icon="ui-icon-circle-check" 
+                                             rendered="#{accionController.nuevo and accionController.ingresaDatos}" title="Guardar" 
+                                             action="#{accionController.guardarAccion()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"/> 
+                            <p:commandButton value="Guardar"  id="btnActualizar" icon="ui-icon-pencil" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"
+                                             rendered="#{accionController.editar and (accionController.ingresaDatos) }" title="Actualizar"    
+                                             actionListener="#{accionController.editarAccion()}" /> 
+                            <p:commandButton value="Cerrar" icon="ui-icon-circle-close" onclick="dlgDialog.hide()" process="@this"/>
+                        </f:facet>
+                    </h:panelGrid>
+                </p:dialog>
+                <p:dialog header="Pegrunta" widgetVar="dlgPregunta" modal="true" resizable="false"
+                          draggable="false" position="center">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="¿Esta seguro que desea eliminar este registro.?" class="label_negrilla"/>
+                        <h:outputText value="* Recuerde que este registro puede estar enlazada con algunas funciones del sistema."/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="SI" icon="ui-icon-circle-check" actionListener="#{accionController.eliminarAccion()}"
+                                             update=":frmListado:pnlListado,:frmDialogos:mensajes" process="@this"/>
+                            <p:commandButton value="NO" icon="ui-icon-circle-close" onclick="dlgPregunta.hide()" process="@this"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+
+    </ui:composition>
+</html>

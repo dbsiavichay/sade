@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            ERROR 404
+        </ui:define>
+        <ui:define name="listados">
+
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+                <p:tabView id="tabInfo" style="height: 100%">
+                    <p:messages id="msgListados"/>
+                    <p:tab id="pnlListado" title="ERROR">
+                        <p:panel style="text-align:center; border: #176311">
+                            <h:panelGrid columns="1" style="width:100%">
+                                <h:outputLabel value=""/>
+                                <p:graphicImage  value = "/resources/imagenes/404.png" width="200" height="200"/>  
+                                <p:spacer height="20px"/>
+                                <h:outputLabel value="404" style="font-weight: bold; color: #176311; font-size: 60px"/>
+                                <h:outputLabel value="Ooops, Lo sentimos el archivo solicitado no se pudo encontrar" style="font-weight: bold; color: #176311; font-size: 30px"/>
+                            </h:panelGrid>
+                        </p:panel>                             
+                    </p:tab>
+                </p:tabView>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>            
+        </ui:define>
+    </ui:composition>
+</html>
+

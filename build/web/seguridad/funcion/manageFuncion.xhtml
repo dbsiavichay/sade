@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/templates/templatePaginasCompletas.xhtml">
+        <ui:define name="tituloPagina">
+            Administración de Funciones
+        </ui:define>
+        <ui:define name="listados">
+
+            <p:ajaxStatus onstart="dlgProcesar.show()" oncomplete="dlgProcesar.hide()"/>
+            <h:form id="frmListado">
+                <p:panel id="pnlListado" header="Administración de funciones">
+                    <p:messages id="msgListados"/>
+                    <p:commandButton id="btnNuevo" value="Nuevo" icon="ui-icon-circle-plus"  title="Nuevo" 
+                                     actionListener="#{funcionController.preparaNuevo()}"  oncomplete="dlgDialog.show()" 
+                                     rendered="#{usuariosDataManager.funcionActual.agregar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" />
+                    <p:separator id="separator"/> 
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Roles:" for="cboRoles" class="label_negrilla"/>
+                        <p:selectOneMenu id="cboRoles" value="#{funcionController.rolSeleccionado}">
+                            <f:selectItems value="#{rolController.roles}" var="rol" itemLabel="#{rol.nombre}" itemValue="#{rol.id}"/>
+                        </p:selectOneMenu>
+                        <p:commandButton id="btnActualizar" icon="ui-icon-refresh" action="#{funcionController.cambiarLista()}" update=":frmListado:pnlListado"/>
+                    </h:panelGrid>
+                    <p:dataTable id="tblFunciones" var="funcion"  value="#{funcionController.funciones}" filteredValue="#{funcionController.funcionesFiltro}" 
+                                 paginator="#{funcionController.funciones.size()>10}" rows="10" emptyMessage="#{mensajes.sinDatos}" >                            
+                        <p:column sortBy="#{funcion.grupo.nombre}" headerText="GRUPO"  filterBy="#{funcion.grupo.nombre}"  filterMatchMode="contains">
+                            #{funcion.grupo.nombre}
+                        </p:column>
+                        <p:column sortBy="#{funcion.accion.nombre}" headerText="ACCION"  filterBy="#{funcion.accion.nombre}"  filterMatchMode="contains">
+                            #{funcion.accion.nombre}
+                        </p:column>
+                        <p:column headerText="AGREGAR">                                
+                            #{funcion.agregar?"SI":"NO"}
+                        </p:column>  
+                        <p:column headerText="EDITAR">                                
+                            #{funcion.editar?"SI":"NO"}
+                        </p:column>  
+                        <p:column headerText="ELIMINAR">                                
+                            #{funcion.eliminar?"SI":"NO"}
+                        </p:column>  
+                        <p:column headerText="ORDEN">                                
+                            #{funcion.orden}
+                        </p:column>  
+                        <p:column headerText="ACTIVO">                                
+                            #{funcion.activo?"SI":"NO"}
+                        </p:column>                            
+                        <p:column>
+                            <p:commandButton id="btnVer" icon="ui-icon-search" title="Ver" oncomplete="dlgDialog.show()" 
+                                             action="#{funcionController.preparaVer()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" >
+                                <f:setPropertyActionListener value="#{funcion}" target="#{funcionController.funcionActual}"/>                                    
+                            </p:commandButton>
+                            <p:commandButton id="btnEditar" icon="ui-icon-pencil"  title="Editar" oncomplete="dlgDialog.show()"
+                                             action="#{funcionController.preparaEditar}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes"
+                                             rendered="#{usuariosDataManager.funcionActual.editar}" >
+                                <f:setPropertyActionListener value="#{funcion}" target="#{funcionController.funcionActual}"/>
+
+                            </p:commandButton>
+                            <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar" oncomplete="dlgPregunta.show()"
+                                             update=":frmDialogos:pnlDatos" rendered="#{usuariosDataManager.funcionActual.eliminar}">
+                                <f:setPropertyActionListener value="#{funcion}" target="#{funcionController.funcionActual}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>                    
+                </p:panel>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlgProcesar" modal="true" closable="false" resizable="false" showHeader="false" >
+                <h:graphicImage value="/resources/imagenes/ajax-loader.gif"/>
+            </p:dialog>
+            <h:form id="frmDialogos">
+                <p:dialog header="Datos de Funcion" widgetVar="dlgDialog" modal="true" resizable="false"
+                          draggable="true" position="center" width="700">
+                    <p:growl id="mensajes"/>
+                    <h:panelGrid id="pnlDatos" columns="3" columnClasses="columna_derecha,columna_izquierda" >
+                        <h:outputLabel value="Grupo" for="cboGrupo" class="label_negrilla"/>
+                        <p:selectOneMenu id="cboGrupo" value="#{funcionController.funcionActual.idGrupo}" required="true" requiredMessage="Este campo es obligatorio"
+                                         disabled="#{not funcionController.ingresaDatos}">
+                            <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                            <f:selectItems value="#{grupoController.grupos}" var="grupo" itemLabel="#{grupo.nombre}" itemValue="#{grupo.id}"/>
+                        </p:selectOneMenu>                        
+                        <p:message for="cboGrupo" />
+                        
+                        <h:outputLabel value="Acción" for="cboAccion" class="label_negrilla"/>
+                        <p:selectOneMenu id="cboAccion" value="#{funcionController.funcionActual.idAccion}" required="true" requiredMessage="Este campo es obligatorio"
+                                         disabled="#{not funcionController.ingresaDatos}">
+                            <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                            <f:selectItems value="#{accionController.acciones}" var="accion" itemLabel="#{accion.nombre}" itemValue="#{accion.id}"/>
+                        </p:selectOneMenu>                        
+                        <p:message for="cboAccion" />
+                        
+                        <h:outputLabel value="Rol" for="cboRol" class="label_negrilla"/>
+                        <p:selectOneMenu id="cboRol" value="#{funcionController.funcionActual.idRol}" required="true" requiredMessage="Este campo es obligatorio"
+                                         disabled="#{not funcionController.ingresaDatos}">
+                            <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                            <f:selectItems value="#{rolController.roles}" var="rol" itemLabel="#{rol.nombre}" itemValue="#{rol.id}"/>
+                        </p:selectOneMenu>                        
+                        <p:message for="cboRol" />
+                        
+                        <h:outputLabel value="Permisos"  class="label_negrilla"/>
+                        <h:panelGrid columns="3">
+                            <p:selectBooleanCheckbox id="chkAgregar" value="#{funcionController.funcionActual.agregar}" 
+                                                     itemLabel="Agregar"  disabled="#{not funcionController.ingresaDatos}"/>
+                            <p:selectBooleanCheckbox id="chkEditar" value="#{funcionController.funcionActual.editar}" 
+                                                     itemLabel="Editar" disabled="#{not funcionController.ingresaDatos}"/>
+                            <p:selectBooleanCheckbox id="chkEliminar" value="#{funcionController.funcionActual.eliminar}" 
+                                                     itemLabel="Eliminar" disabled="#{not funcionController.ingresaDatos}"/>
+                        </h:panelGrid>
+                        <h:outputLabel value=""/>
+
+                        <h:outputLabel value="Orden" for="txtOrden" class="label_negrilla"/>
+                        <p:inputText id="txtOrden" value="#{funcionController.funcionActual.orden}" title="Orden de la función." 
+                                     required="true" requiredMessage="Este campo es obligatorio" size="20" disabled="#{not funcionController.ingresaDatos}"/>
+                        <p:message for="txtOrden" />
+
+                        <h:outputLabel value="Activo" for="chkActivo" class="label_negrilla"/>
+                        <p:selectBooleanCheckbox id="chkActivo" value="#{funcionController.funcionActual.activo}" 
+                                                 disabled="#{not funcionController.ingresaDatos}"/>
+                        <p:message for="chkActivo" />                                           
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Guardar"  id="btnGuardar" icon="ui-icon-circle-check" 
+                                             rendered="#{funcionController.nuevo and funcionController.ingresaDatos}" title="Guardar" 
+                                             action="#{funcionController.guardarFuncion()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"/> 
+                            <p:commandButton value="Guardar"  id="btnActualizar" icon="ui-icon-pencil" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes,:frmListado:pnlListado"
+                                             rendered="#{funcionController.editar and (funcionController.ingresaDatos) }" title="Actualizar"    
+                                             actionListener="#{funcionController.editarFuncion()}" /> 
+                            <p:commandButton value="Cerrar" icon="ui-icon-circle-close" onclick="dlgDialog.hide()" process="@this"/>
+                        </f:facet>
+                    </h:panelGrid>
+                </p:dialog>
+                <p:dialog header="Pegrunta" widgetVar="dlgPregunta" modal="true" resizable="false"
+                          draggable="false" position="center">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="¿Esta seguro que desea eliminar este registro.?" class="label_negrilla"/>
+                        <h:outputText value="* Recuerde que este registro puede estar enlazada con algunas funciones del sistema."/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="SI" icon="ui-icon-circle-check" actionListener="#{funcionController.eliminarFuncion()}"
+                                             update=":frmListado:pnlListado,:frmDialogos:mensajes" process="@this"/>
+                            <p:commandButton value="NO" icon="ui-icon-circle-close" onclick="dlgPregunta.hide()" process="@this"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+
+    </ui:composition>
+</html>
+
