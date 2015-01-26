@@ -170,10 +170,9 @@ public class UsuariosDataManager implements Serializable {
     public String ingresarSistema() {
         RolModel rolModel = new RolModel();
         try {
-            //String rolCarrera = this.webServiceModel.autenticarDocente(this.usuarioSesion.getCedula(), this.usuarioSesion.getContrasena());
+            String rolCarrera = this.webServiceModel.autenticarDocente(this.usuarioSesion.getCedula(), this.usuarioSesion.getContrasena());
             this.usuarioSesion.setContrasena(this.usuarioSesion.getContrasena().toLowerCase());
-            //this.usuarioSesion.encriptarContrasena();            
-            String rolCarrera = null;
+            //this.usuarioSesion.encriptarContrasena();                        
             if (rolCarrera != null) {
                 Usuario usuario = this.usuarioModel.encontrarPorCedula(this.usuarioSesion.getCedula());
                 Persona persona = this.webServiceModel.getDatosDocente(rolCarrera, this.usuarioSesion.getCedula());
