@@ -147,7 +147,8 @@ public class UsuariosDataManager implements Serializable {
             this.menuUsuario = NodoMenuModel.generarMenuUsuario(this.rolActual.getId());
             this.pagina = "bienvenida.xhtml";
         } catch (Exception ex) {
-            Mensajeria.addErrorMessage(ex.getMessage());
+            Mensajeria.addErrorMessage("Oops. Lo sentimos tuvimos un error interno al intentar cambiar el rol.");
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -156,7 +157,8 @@ public class UsuariosDataManager implements Serializable {
         try {
             this.funcionActual = permisoRolModel.encontrar(this.accionSelected);
         } catch (Exception e) {
-            Mensajeria.addErrorMessage(e.getMessage());
+            Mensajeria.addErrorMessage("Oops. Lo sentimos tuvimos un error interno al intentar establecer permisos de la página solicitada.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -168,10 +170,10 @@ public class UsuariosDataManager implements Serializable {
     public String ingresarSistema() {
         RolModel rolModel = new RolModel();
         try {
-            String rolCarrera = this.webServiceModel.autenticarDocente(this.usuarioSesion.getCedula(), this.usuarioSesion.getContrasena());
+            //String rolCarrera = this.webServiceModel.autenticarDocente(this.usuarioSesion.getCedula(), this.usuarioSesion.getContrasena());
             this.usuarioSesion.setContrasena(this.usuarioSesion.getContrasena().toLowerCase());
             //this.usuarioSesion.encriptarContrasena();            
-
+            String rolCarrera = null;
             if (rolCarrera != null) {
                 Usuario usuario = this.usuarioModel.encontrarPorCedula(this.usuarioSesion.getCedula());
                 Persona persona = this.webServiceModel.getDatosDocente(rolCarrera, this.usuarioSesion.getCedula());
@@ -233,7 +235,8 @@ public class UsuariosDataManager implements Serializable {
             this.pagina = "bienvenida.xhtml";
             return "faces/frmHome?faces-redirect=true";
         } catch (Exception ex) {
-            Mensajeria.addErrorMessage(ex.getMessage());
+            Mensajeria.addErrorMessage("Oops. Lo sentimos tuvimos un error interno al intentar conectarse con los servicios.");
+            System.out.println(ex.getMessage());
             return null;
         }
     }
@@ -246,7 +249,8 @@ public class UsuariosDataManager implements Serializable {
                 Mensajeria.addSuccessMessage("La operacion fue realizada satisfactoriamente.");
             }
         } catch (Exception e) {
-            Mensajeria.addErrorMessage("Error al cambiar el password.\n" + e.getMessage());
+            Mensajeria.addErrorMessage("Oops. Lo sentimos tuvimos un erro interno al intentar actualizar los datos.");
+            System.out.println(e.getMessage());
         }
 
     }

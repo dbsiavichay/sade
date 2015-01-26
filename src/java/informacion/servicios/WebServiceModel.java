@@ -8,7 +8,6 @@ import com.sun.xml.bind.api.JAXBRIContext;
 import com.sun.xml.ws.api.message.Headers;
 import com.sun.xml.ws.developer.WSBindingProvider;
 import informacion.entidades.Materia;
-import informacion.entidades.MateriaProceso;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.JAXBContext;
