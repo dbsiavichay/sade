@@ -8,6 +8,7 @@ import informacion.entidades.CampoDetallado;
 import informacion.entidades.Categoria;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -107,4 +108,29 @@ public class Titulo {
         this.camposDetallados = camposDetallados;
     }
     //</editor-fold>    
+
+    //<editor-fold defaultstate="collapsed" desc="Sobreescritos">
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        return hash;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Titulo other = (Titulo) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
+    }
+    //</editor-fold>
+    
+    
 }

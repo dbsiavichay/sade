@@ -156,7 +156,7 @@ public class TituloController {
         this.nuevo = false;
         this.editar = false;
         this.ingresaDatos = false;
-        this.documento = null;
+        this.documento = null;        
         this.prepararCampos();
     }
     
@@ -286,9 +286,9 @@ public class TituloController {
         }
     }
 
-    public void cambiarListaTitulos() {
+    public void cambiarListaTitulos() {        
         try {
-            this.titulos = this.docenteSeleccionado != 0 ? this.tituloModel.encontrarPorDocente(this.docenteSeleccionado) : this.tituloModel.encontrarTodos();
+            this.titulos = this.tituloModel.consultaTitulosPorDocenteConCampos(this.docenteSeleccionado);
         } catch (Exception e) {
             Mensajeria.addErrorMessage(Titulo.class, e, TipoOrigenError.LISTADO);
         }

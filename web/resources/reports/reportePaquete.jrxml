@@ -142,34 +142,22 @@
 		<band/>
 	</columnFooter>
 	<pageFooter>
-		<band height="35">
+		<band height="15">
 			<textField>
-				<reportElement uuid="bd4e123d-0a3b-4ca7-95a7-0ca41023bb1b" mode="Opaque" x="0" y="19" width="515" height="13" backcolor="#E6E6E6"/>
+				<reportElement uuid="bd4e123d-0a3b-4ca7-95a7-0ca41023bb1b" mode="Opaque" x="0" y="0" width="515" height="13" backcolor="#E6E6E6"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA["Página "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement uuid="c3ebfc55-2a71-4437-b761-8e6d24ab3b59" mode="Opaque" x="515" y="19" width="40" height="13" backcolor="#E6E6E6"/>
+				<reportElement uuid="c3ebfc55-2a71-4437-b761-8e6d24ab3b59" mode="Opaque" x="515" y="0" width="40" height="13" backcolor="#E6E6E6"/>
 				<textElement/>
 				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement uuid="9dcdd83c-69fa-4db3-9911-de54320d20bf" x="0" y="19" width="100" height="13"/>
+				<reportElement uuid="9dcdd83c-69fa-4db3-9911-de54320d20bf" x="0" y="0" width="100" height="13"/>
 				<textElement/>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement uuid="243f7fff-53fb-4260-a2f6-f3a2ab336474" x="251" y="0" width="140" height="20"/>
-				<textElement verticalAlignment="Middle"/>
-				<text><![CDATA[Denis Siavichay y Luis Parra]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="9f32f377-cdb8-4734-b625-ee7aab826b6b" x="159" y="0" width="85" height="20"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Desarrolladores:]]></text>
-			</staticText>
 		</band>
 	</pageFooter>
 	<summary>

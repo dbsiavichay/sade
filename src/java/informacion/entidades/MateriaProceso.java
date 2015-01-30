@@ -22,6 +22,8 @@ public class MateriaProceso {
 
     //<editor-fold defaultstate="collapsed" desc="Constructores">
     public MateriaProceso() {
+        this.materia = new Materia();
+        this.proceso = new Proceso();
     }
 
     public MateriaProceso(Integer id, Integer idMateria, Integer idProceso) {

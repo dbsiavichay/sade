@@ -17,7 +17,6 @@ import informacion.servicios.CampoDetalladoModel;
 import informacion.servicios.CampoEspecificoModel;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -48,11 +47,12 @@ public class TituloDocenteController {
     private String categoriaSeleccionada;
     private Boolean regitroObligatorio;
     private Integer campoAmplioSeleccionado;
-    private Integer campoEspecificoSeleccionado;
-    private List<String> camposDetalladosSelected;
+    private Integer campoEspecificoSeleccionado;    
     private List<CampoDetallado> camposDetalladosSeleccionados;
     private List<CampoEspecifico> camposEspecificos;
     private List<CampoDetallado> camposDetallados;
+    private Integer campoDetalladoSeleccionado;
+    private Integer tituloSeleccionado;
     @ManagedProperty(value = "#{usuariosDataManager}")
     private UsuariosDataManager usuariosDataManager;
     //</editor-fold>
@@ -61,8 +61,8 @@ public class TituloDocenteController {
     public TituloDocenteController() {
         this.tituloActual = new Titulo();
         this.tituloModel = new TituloModel();
-        this.nuevo = true;
-        this.ingresaDatos = true;
+        this.nuevo = false;
+        this.ingresaDatos = false;
         this.editar = false;
     }
 
@@ -174,14 +174,14 @@ public class TituloDocenteController {
         this.campoEspecificoSeleccionado = campoEspecificoSeleccionado;
     }
 
-    public List<String> getCamposDetalladosSelected() {
-        return camposDetalladosSelected;
+    public Integer getCampoDetalladoSeleccionado() {
+        return campoDetalladoSeleccionado;
     }
 
-    public void setCamposDetalladosSelected(List<String> camposDetalladosSelected) {
-        this.camposDetalladosSelected = camposDetalladosSelected;
+    public void setCampoDetalladoSeleccionado(Integer campoDetalladoSeleccionado) {
+        this.campoDetalladoSeleccionado = campoDetalladoSeleccionado;
     }
-
+   
     public List<CampoDetallado> getCamposDetalladosSeleccionados() {
         return camposDetalladosSeleccionados;
     }
@@ -205,17 +205,17 @@ public class TituloDocenteController {
     public void setCamposDetallados(List<CampoDetallado> camposDetallados) {
         this.camposDetallados = camposDetallados;
     }
-    //</editor-fold>
 
-    //<editor-fold defaultstate="collapsed" desc="FUNCIONES DE PREPARACION">
-    public void preparaSeleccionCampos() {
-        this.campoAmplioSeleccionado = null;
-        this.campoEspecificoSeleccionado = null;
-        this.camposEspecificos = null;
-        this.camposDetallados = null;
-        this.camposDetalladosSelected = null;
+    public Integer getTituloSeleccionado() {
+        return tituloSeleccionado;
     }
 
+    public void setTituloSeleccionado(Integer tituloSeleccionado) {
+        this.tituloSeleccionado = tituloSeleccionado;
+    }        
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="FUNCIONES DE PREPARACION">    
     public void preparaNuevo() {
         this.tituloActual = new Titulo();
         this.nuevo = true;
@@ -223,17 +223,37 @@ public class TituloDocenteController {
         this.editar = false;
         this.documento = null;
         this.categoriaSeleccionada = null;
-        this.camposDetalladosSeleccionados = new ArrayList<>();
+        this.campoAmplioSeleccionado = null;
+        this.campoEspecificoSeleccionado = null;
+        this.campoDetalladoSeleccionado = null;
+        this.camposEspecificos = null;
+        this.camposDetallados = null;
     }
 
     public void preparaEditar() {
         this.nuevo = false;
         this.ingresaDatos = true;
-        this.editar = true;    
+        this.editar = true;
         this.documento = null;
         this.categoriaSeleccionada = this.tituloActual.getIdCategoria().toString()
                 + ":" + this.tituloActual.getCategoria().getEstudioFormal().toString();
         this.camposDetalladosSeleccionados = this.tituloActual.getCamposDetallados();
+        this.campoAmplioSeleccionado = this.tituloActual.getCamposDetallados().get(0).getCampoEspecifico().getIdCampoAmplio();
+        this.cambiarListaCamposEspecificos();
+        this.campoEspecificoSeleccionado = this.tituloActual.getCamposDetallados().get(0).getIdCampoEspecifico();
+        this.cambiarListaCamposDetallados();
+        this.campoDetalladoSeleccionado = this.tituloActual.getCamposDetallados().get(0).getId();
+        
+        
+    }
+    
+    public void preparaVer(){
+        Titulo titulo = new Titulo();
+        titulo.setId(this.tituloSeleccionado);
+        this.tituloActual = this.titulos.get(this.titulos.indexOf(titulo));   
+        this.nuevo = false;
+        this.ingresaDatos = true;
+        this.editar = true;            
     }
     //</editor-fold>    
 
@@ -249,7 +269,7 @@ public class TituloDocenteController {
             this.tituloActual.setIdCategoria(Integer.valueOf(this.categoriaSeleccionada.split(":")[0]));
             if (this.documento != null) {
                 this.guardarArchivo(this.tituloActual.getIdDocente());
-                this.tituloActual.setUrlDocumento("/resources/pdf/" + this.tituloActual.getIdDocente() + "/" + documento.getFileName());
+                this.tituloActual.setUrlDocumento("/resources/pdf/" + this.tituloActual.getIdDocente() + "/" + documento.getFileName().trim().replace(" ", "_"));
             }
             _titulo = this.tituloModel.crear(this.tituloActual);
         } catch (Exception e) {
@@ -257,15 +277,19 @@ public class TituloDocenteController {
         }
         if (_titulo != null) {
             this.tituloActual = _titulo;
-            this.editar = true;
+            this.tituloSeleccionado = this.tituloActual.getId();
+            this.guardarCampo();                 
+            this.editar = false;
             this.nuevo = false;
             this.ingresaDatos = true;
             Mensajeria.addSuccessMessage(Titulo.class, OpcionesSobreTablas.INSERCION);
             try {
-                this.titulos = this.tituloModel.consultaTitulosPorDocenteConCampos(this.usuariosDataManager.getUsuarioSesion().getId());
+                this.titulos = this.tituloModel.consultaTitulosPorDocenteConCampos(this.usuariosDataManager.getUsuarioSesion().getId());                
             } catch (Exception e) {
                 Mensajeria.addErrorMessage(Titulo.class, TipoOrigenError.LISTADO);
             }
+            this.preparaVer();
+            DefaultRequestContext.getCurrentInstance().execute("dlgDialog.hide()");
         } else {
             Mensajeria.addErrorMessage(Titulo.class, TipoOrigenError.ENTIDAD);
         }
@@ -277,14 +301,16 @@ public class TituloDocenteController {
             this.tituloActual.setIdCategoria(Integer.valueOf(this.categoriaSeleccionada.split(":")[0]));
             if (this.documento != null) {
                 this.guardarArchivo(this.tituloActual.getIdDocente());
-                this.tituloActual.setUrlDocumento("/resources/pdf/" + this.tituloActual.getIdDocente() + "/" + documento.getFileName());
+                this.tituloActual.setUrlDocumento("/resources/pdf/" + this.tituloActual.getIdDocente() + "/" + documento.getFileName().trim().replace(" ", "_"));
             }
             _titulo = this.tituloModel.editar(this.tituloActual);
         } catch (Exception e) {
             Mensajeria.addErrorMessage(Titulo.class, e, TipoOrigenError.ENTIDAD);
         }
-        if (_titulo != null) {
+        if (_titulo != null) {  
             this.tituloActual = _titulo;
+            this.tituloSeleccionado = this.tituloActual.getId();
+            this.editarCampo();
             this.editar = true;
             this.nuevo = false;
             this.ingresaDatos = true;
@@ -294,6 +320,8 @@ public class TituloDocenteController {
             } catch (Exception e) {
                 Mensajeria.addErrorMessage(Titulo.class, TipoOrigenError.LISTADO);
             }
+            this.preparaVer();
+            DefaultRequestContext.getCurrentInstance().execute("dlgDialog.hide()");
         } else {
             Mensajeria.addErrorMessage(Titulo.class, TipoOrigenError.ENTIDAD);
         }
@@ -310,11 +338,12 @@ public class TituloDocenteController {
         if (exito) {
             try {
                 this.titulos = this.tituloModel.consultaTitulosPorDocenteConCampos(this.usuariosDataManager.getUsuarioSesion().getId());
+                this.tituloActual = new Titulo();
+                this.tituloSeleccionado = null;
             } catch (Exception ex) {
                 Mensajeria.addErrorMessage(Titulo.class, ex, TipoOrigenError.LISTADO);
                 return;
-            }
-            this.preparaNuevo();
+            }            
             Mensajeria.addSuccessMessage(Titulo.class, OpcionesSobreTablas.ELIMINACION);
             DefaultRequestContext.getCurrentInstance().execute("dlgPregunta.hide()");
         } else {
@@ -338,7 +367,7 @@ public class TituloDocenteController {
             if (!file.exists()) {
                 file.mkdir();
             }
-            FileOutputStream fileOuputStream = new FileOutputStream(basePath + idDocente + "/" + this.documento.getFileName());
+            FileOutputStream fileOuputStream = new FileOutputStream(basePath + idDocente + "/" + this.documento.getFileName().trim().replace(" ", "_"));
             fileOuputStream.write(this.documento.getContents());
             fileOuputStream.close();
         } catch (Exception e) {
@@ -354,7 +383,8 @@ public class TituloDocenteController {
             CampoEspecificoModel campoEspecificoModel = new CampoEspecificoModel();
             this.camposEspecificos = campoEspecificoModel.encontrarPorCampoAmplio(this.campoAmplioSeleccionado);
             this.camposDetallados = null;
-            this.camposDetalladosSelected = null;
+            this.campoEspecificoSeleccionado = null;
+            this.campoDetalladoSeleccionado = null;
         } catch (Exception e) {
             Mensajeria.addErrorMessage(CampoEspecifico.class, e, TipoOrigenError.LISTADO);
         }
@@ -367,84 +397,40 @@ public class TituloDocenteController {
         try {
             CampoDetalladoModel campoDetalladoModel = new CampoDetalladoModel();
             this.camposDetallados = campoDetalladoModel.encontrarPorCampoEspecifico(this.campoEspecificoSeleccionado);
-
-            if (this.camposDetalladosSeleccionados != null) {
-                this.camposDetalladosSelected = new ArrayList<String>();
-                for (CampoDetallado campo : this.camposDetalladosSeleccionados) {
-                    this.camposDetalladosSelected.add(campo.getId().toString());
-                }
-            }
+            this.campoDetalladoSeleccionado = null;
+            
         } catch (Exception e) {
             Mensajeria.addErrorMessage(CampoDetallado.class, e, TipoOrigenError.LISTADO);
         }
     }
 
-    public void guardarCampos() {
-        CampoDetalladoTituloModel campoDetalladoTituloModel = new CampoDetalladoTituloModel();
-        CampoDetalladoModel campoDetalladoModel = new CampoDetalladoModel();
+    public void guardarCampo() {
+        CampoDetalladoTituloModel campoDetalladoTituloModel = new CampoDetalladoTituloModel();        
 
         try {
-            List<CampoDetalladoTitulo> camposDetalladosTitulo = campoDetalladoTituloModel.encontrarPorTitulo(this.tituloActual.getId());
-            List<CampoDetallado> camposDetalladosActuales = campoDetalladoModel.encontrarPorTitulo(this.tituloActual.getId());
-            for (int i = 0; i < camposDetalladosActuales.size(); i++) {
-                if (camposDetalladosActuales.get(i).getIdCampoEspecifico() != this.campoEspecificoSeleccionado) {
-                    camposDetalladosActuales.remove(i);
-                    i = i - 1;
-                }
-            }
+            CampoDetalladoTitulo campoDetalladoTitulo = new CampoDetalladoTitulo();
+            campoDetalladoTitulo.setIdCampoDetallado(this.campoDetalladoSeleccionado);
+            campoDetalladoTitulo.setIdTitulo(this.tituloActual.getId());
+            campoDetalladoTituloModel.crear(campoDetalladoTitulo);               
+        } catch (Exception e) {
+            Mensajeria.addErrorMessage("Error al guardar el campo seleccionado.");
+            System.out.println(e.getMessage());
+        }
+    }
 
-            for (int i = 0; i < camposDetalladosTitulo.size(); i++) {
-                CampoDetallado campoDetallado = new CampoDetallado();
-                campoDetallado.setId(camposDetalladosTitulo.get(i).getIdCampoDetallado());
-                if (!camposDetalladosActuales.contains(campoDetallado)) {
-                    camposDetalladosTitulo.remove(i);
-                    i = i - 1;
-                }
-            }
+    
+    public void editarCampo() {
+        CampoDetalladoTituloModel campoDetalladoTituloModel = new CampoDetalladoTituloModel();        
 
-
-            for (String idCampoDetallado : this.camposDetalladosSelected) {
-                CampoDetalladoTitulo campoDetalladoTitulo = new CampoDetalladoTitulo();
-                campoDetalladoTitulo.setIdTitulo(this.tituloActual.getId());
-                campoDetalladoTitulo.setIdCampoDetallado(Integer.valueOf(idCampoDetallado));
-                if (camposDetalladosTitulo.contains(campoDetalladoTitulo)) {
-                    camposDetalladosTitulo.remove(campoDetalladoTitulo);
-                } else {
-                    camposDetalladosTitulo.add(campoDetalladoTitulo);
-                }
-            }
-
-            for (CampoDetalladoTitulo campo : camposDetalladosTitulo) {
-                if (campo.getId() != null) {
-                    campoDetalladoTituloModel.eliminar(campo);
-                } else {
-                    campoDetalladoTituloModel.crear(campo);
-                }
-            }
-
-            this.camposDetalladosSeleccionados = campoDetalladoModel.encontrarPorTitulo(this.tituloActual.getId());
-            this.camposDetalladosSelected = null;
-            Mensajeria.addSuccessMessage("Las areas seleccionadas se han guardado correctamente");
-            DefaultRequestContext.getCurrentInstance().execute("dlgDialog.hide()");
+        try {
+            CampoDetalladoTitulo campoDetalladoTitulo = campoDetalladoTituloModel.encontrarPorTitulo(this.tituloActual.getId()).get(0);
+            campoDetalladoTitulo.setIdCampoDetallado(this.campoDetalladoSeleccionado);
+            campoDetalladoTitulo.setIdTitulo(this.tituloActual.getId());
+            campoDetalladoTituloModel.editar(campoDetalladoTitulo);                                     
         } catch (Exception e) {
             Mensajeria.addErrorMessage("Error al guardar campos.");
+            System.out.println(e.getMessage());
         }
-    }
-
-    public void eliminarCampos() {
-        CampoDetalladoTituloModel campoDetalladoTituloModel = new CampoDetalladoTituloModel();
-        try {
-            for (String idCampoDetallado : this.camposDetalladosSelected) {
-                CampoDetalladoTitulo campoDetalladoTitulo = new CampoDetalladoTitulo();
-                campoDetalladoTitulo.setIdTitulo(this.tituloActual.getId());
-                campoDetalladoTitulo.setIdCampoDetallado(Integer.valueOf(idCampoDetallado));
-                campoDetalladoTituloModel.eliminarPorCampoTitulo(campoDetalladoTitulo);
-            }
-            CampoDetalladoModel campoDetalladoModel = new CampoDetalladoModel();
-            this.camposDetalladosSeleccionados = campoDetalladoModel.encontrarPorTitulo(this.tituloActual.getId());
-        } catch (Exception e) {
-            Mensajeria.addErrorMessage("Error al eliminar campos.");
-        }
-    }
+    }        
     //</editor-fold>              
 }

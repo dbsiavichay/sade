@@ -33,7 +33,7 @@ public class MateriaProcesoController {
     private MateriaProcesoModel materiaProcesoModel;
     private List<Materia> materias;
     private List<Materia> materiasFiltrado;
-    private List<String> materiasSeleccionadas;    
+    private List<String> materiasSeleccionadas;
     private Integer materiaEliminada;
     private List<UnidadAcademica> carreras;
     private List<Materia> materiasCarrera;
@@ -49,7 +49,7 @@ public class MateriaProcesoController {
         try {
             if (idProceso != null) {
                 MateriaModel materiaModel = new MateriaModel();
-                this.procesoSeleccionado = Integer.valueOf(idProceso);                                
+                this.procesoSeleccionado = Integer.valueOf(idProceso);
                 this.materias = materiaModel.encontrarPorProceso(this.procesoSeleccionado);
             }
         } catch (Exception e) {
@@ -136,43 +136,50 @@ public class MateriaProcesoController {
 
     public void setCarreraSeleccionada(String carreraSeleccionada) {
         this.carreraSeleccionada = carreraSeleccionada;
-    }       
+    }
     //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="FUNCIONES">
-    public void guardarMateriaProceso() {        
-        if(this.materiasSeleccionadas==null){
+    public void guardarMateriaProceso() {
+        if (this.materiasSeleccionadas == null) {
             return;
         }
-              
+
         Boolean exito = false;
         try {
             List<MateriaProceso> materiasBase = this.materiaProcesoModel.encontrarPorProcesoYCarrera(this.procesoSeleccionado, this.carreraSeleccionada);
-            
+
             for (String idMateria : this.materiasSeleccionadas) {
                 MateriaProceso mp = new MateriaProceso(null, Integer.valueOf(idMateria), this.procesoSeleccionado);
-                if(materiasBase.contains(mp)){
+                if (materiasBase.contains(mp)) {
                     materiasBase.remove(mp);
-                }else{
+                } else {
                     materiasBase.add(mp);
                 }
             }
-            
+
             CampoDetalladoModel campoDetalladoModel = new CampoDetalladoModel();
             MateriaModel materiaModel = new MateriaModel();
             for (MateriaProceso mp : materiasBase) {
-                if(mp.getId()!=null){
-                    this.materiaProcesoModel.eliminar(mp);                    
-                }else{                    
-                    List<CampoDetallado> camposMateria = campoDetalladoModel.encontrarPorMateria(mp.getIdMateria());
-                    if(!camposMateria.isEmpty()){
-                        this.materiaProcesoModel.crear(mp);                    
-                    }else{
-                        Materia materia = materiaModel.encontrar(mp.getIdMateria());
-                        Mensajeria.addErrorMessage("La materia "+materia.getNombreMateria()+"\n"
-                                +"no se encuentra clasificada bajo ningun campo por lo cual no se ha podido agregar.\n"
-                                +"Dirijase a la sección de clasificación de materias.");
-                    }                    
+                if (mp.getId() != null) {
+                    this.materiaProcesoModel.eliminar(mp);
+                } else {
+                    MateriaProceso matprc = this.materiaProcesoModel.encontrarPorMateria(mp.getIdMateria());
+                    if (matprc != null) {
+                        this.materiasSeleccionadas.remove(mp.getIdMateria().toString());
+                        Mensajeria.addErrorMessage("La materia " + matprc.getMateria().getNombreMateria() + " ya se encuentra en el paquete\n"
+                                + matprc.getProceso().getCodigo() + ", " + matprc.getProceso().getDescripcion());
+                    } else {
+                        List<CampoDetallado> camposMateria = campoDetalladoModel.encontrarPorMateria(mp.getIdMateria());
+                        if (!camposMateria.isEmpty()) {
+                            this.materiaProcesoModel.crear(mp);
+                        } else {
+                            Materia materia = materiaModel.encontrar(mp.getIdMateria());
+                            Mensajeria.addErrorMessage("La materia " + materia.getNombreMateria() + "\n"
+                                    + "no se encuentra clasificada bajo ningun campo por lo cual no se ha podido agregar.\n"
+                                    + "Dirijase a la sección de clasificación de materias.");
+                        }
+                    }
                 }
             }
             exito = true;
@@ -187,12 +194,12 @@ public class MateriaProcesoController {
             } catch (Exception e) {
                 Mensajeria.addErrorMessage(MateriaProceso.class, e, TipoOrigenError.LISTADO);
             }
-            Mensajeria.addSuccessMessage("La acción ha sido realizada con éxito");            
+            Mensajeria.addSuccessMessage("La acción ha sido realizada con éxito");
         } else {
             Mensajeria.addErrorMessage(MateriaProceso.class, TipoOrigenError.LISTADO);
-        }     
+        }
     }
-    
+
     public void eliminarMateriaProceso() {
         Boolean exito = false;
         try {
@@ -211,7 +218,7 @@ public class MateriaProcesoController {
                 this.materiasSeleccionadas.remove(this.materiaEliminada.toString());
             } catch (Exception e) {
                 Mensajeria.addErrorMessage(MateriaProceso.class, e, TipoOrigenError.LISTADO);
-            }           
+            }
             Mensajeria.addSuccessMessage(MateriaProceso.class, OpcionesSobreTablas.ELIMINACION);
             DefaultRequestContext.getCurrentInstance().execute("dlgPregunta.hide()");
         } else {
@@ -223,17 +230,17 @@ public class MateriaProcesoController {
         if (this.procesoSeleccionado != null) {
             MateriaModel materiaModel = new MateriaModel();
             try {
-               this.materias = materiaModel.encontrarPorProceso(this.procesoSeleccionado);
-               this.materiasFiltrado = null;
-               this.materiasCarrera = null;
-               this.materiasSeleccionadas = null;
-               this.carreraSeleccionada = null;
+                this.materias = materiaModel.encontrarPorProceso(this.procesoSeleccionado);
+                this.materiasFiltrado = null;
+                this.materiasCarrera = null;
+                this.materiasSeleccionadas = null;
+                this.carreraSeleccionada = null;
             } catch (Exception e) {
                 Mensajeria.addErrorMessage(Materia.class, e, TipoOrigenError.LISTADO);
             }
         }
     }
-    
+
     public void cambiarListaMateriasCarrera() {
         if (this.carreraSeleccionada != null) {
             MateriaModel materiaModel = new MateriaModel();
@@ -241,7 +248,7 @@ public class MateriaProcesoController {
                 this.materiasCarrera = materiaModel.encontrarPorCarrera(this.carreraSeleccionada);
                 this.materiasSeleccionadas = new ArrayList<>();
                 for (Materia materia : this.materias) {
-                    if(this.materiasCarrera.contains(materia)){
+                    if (this.materiasCarrera.contains(materia)) {
                         this.materiasSeleccionadas.add(materia.getId().toString());
                     }
                 }
@@ -249,6 +256,6 @@ public class MateriaProcesoController {
                 Mensajeria.addErrorMessage(Materia.class, e, TipoOrigenError.LISTADO);
             }
         }
-    }   
+    }
     //</editor-fold>
 }

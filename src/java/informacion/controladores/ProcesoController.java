@@ -135,6 +135,7 @@ public class ProcesoController {
         this.ingresaDatos = true;
         this.editar = false;
         this.procesoActual = new Proceso();
+        this.procesoActual.setActivo(Boolean.TRUE);
     }
 
     public void preparaEditar() {

@@ -38,34 +38,27 @@ and open the template in the editor.
                     </h:panelGrid>  
 
                     <p:dataTable id="tblTitulos" var="titulo"  value="#{tituloController.titulos}" filteredValue="#{tituloController.titulosFiltro}" 
-                                 paginator="#{tituloController.titulos.size()>10}" rows="10" emptyMessage="#{mensajes.sinDatos}" >                                                       
-                        <p:column sortBy="#{titulo.nombre}" headerText="TITULO"  filterBy="#{titulo.nombre}"  filterMatchMode="contains">
+                                 paginator="#{tituloController.titulos.size()>10}" rows="10" emptyMessage="#{mensajes.sinDatos}" > 
+                        <p:column sortBy="#{titulo.categoria.nombre}" headerText="NIVEL DE ESTUDIO">
+                            #{titulo.categoria.nombre}
+                        </p:column>   
+                        
+                        <p:column headerText="CAMPO DETALLADO">
+                            #{titulo.camposDetallados.get(0).nombre}
+                        </p:column>   
+                        
+                        <p:column sortBy="#{titulo.nombre}" headerText="TITULO">
                             #{titulo.nombre}
                         </p:column>   
-                        <p:column sortBy="#{titulo.registro}" headerText="N° DE REGISTRO" filterBy="#{titulo.registro}"  filterMatchMode="contains">
+                        <p:column  headerText="N° DE REGISTRO">
                             #{titulo.registro}
                         </p:column>                              
-                        <p:column sortBy="#{titulo.urlDocumento}" headerText="DOCUMENTO" filterBy="#{titulo.urlDocumento}"  filterMatchMode="contains">
+                        <p:column headerText="DOCUMENTO">
                             <h:outputLink target="_blank" value="../../#{titulo.urlDocumento}" rendered="#{titulo.urlDocumento!=null}">
                                 Ir al pdf del título
                             </h:outputLink>                                                        
                             <h:outputLabel value="No hay pdf registrado" rendered="#{titulo.urlDocumento == null}"/>
-                        </p:column>                                                      
-                        <p:column>
-                            <p:commandButton id="btnVer" icon="ui-icon-search" title="Ver" oncomplete="dlgDialog.show()" 
-                                             action="#{tituloController.preparaVer()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes" >
-                                <f:setPropertyActionListener value="#{titulo}" target="#{tituloController.tituloActual}"/>                                    
-                            </p:commandButton>
-                            <p:commandButton id="btnEditar"  icon="ui-icon-pencil"  title="Editar" oncomplete="dlgDialog.show()"  
-                                             action="#{tituloController.preparaEditar()}" update=":frmDialogos:pnlDatos,:frmDialogos:mensajes"
-                                             rendered="#{usuariosDataManager.funcionActual.editar}" >
-                                <f:setPropertyActionListener value="#{titulo}" target="#{tituloController.tituloActual}"/>
-                            </p:commandButton>
-                            <p:commandButton id="btnEliminar" icon="ui-icon-circle-close"  title="Eliminar" oncomplete="dlgPregunta.show()"
-                                             update=":frmDialogos:pnlDatos" rendered="#{usuariosDataManager.funcionActual.eliminar}">
-                                <f:setPropertyActionListener value="#{titulo}" target="#{tituloController.tituloActual}"/>
-                            </p:commandButton>
-                        </p:column>
+                        </p:column>                                                                              
                     </p:dataTable>                    
                 </p:panel>
             </h:form>

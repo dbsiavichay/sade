@@ -148,7 +148,37 @@ public class MateriaProcesoModel {
             throw e;
         }
         return materias;
-    }   
+    }  
+    
+    public MateriaProceso encontrarPorMateria(Integer idMateria) throws Exception {        
+        MateriaProceso materiaProceso = null;
+        try {                        
+            DataBaseReader dbr = AccesoDatos.ejecutaQuery(String.format(MateriaProcesoParametros.CONSULTA_POR_MATERIA,idMateria));
+            if (dbr.next()) {
+                materiaProceso = new MateriaProceso();
+                materiaProceso.setId(dbr.getInt32(1));
+                materiaProceso.setIdMateria(dbr.getInt32(2));
+                materiaProceso.setIdProceso(dbr.getInt32(3));
+                
+                materiaProceso.getMateria().setId(dbr.getInt32(4));
+                materiaProceso.getMateria().setCodigoCarrera(dbr.getString(5));
+                materiaProceso.getMateria().setNombreCarrera(dbr.getString(6));
+                materiaProceso.getMateria().setCodigoMateria(dbr.getString(7));
+                materiaProceso.getMateria().setNombreMateria(dbr.getString(8));
+                
+                materiaProceso.getProceso().setId(dbr.getInt32(9));
+                materiaProceso.getProceso().setCodigo(dbr.getString(10));
+                materiaProceso.getProceso().setDescripcion(dbr.getString(11));
+                materiaProceso.getProceso().setInicia(dbr.getDate(12));
+                materiaProceso.getProceso().setFinaliza(dbr.getDate(13));
+                materiaProceso.getProceso().setActivo(dbr.getBoolean(14));                
+            }
+            dbr.close();
+        } catch (Exception e) {
+            throw e;
+        }
+        return materiaProceso;
+    }  
 
     public List<MateriaProceso> encontrarTodos() throws Exception {
         List<MateriaProceso> materias = new ArrayList<MateriaProceso>();
