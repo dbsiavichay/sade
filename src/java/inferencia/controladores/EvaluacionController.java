@@ -24,6 +24,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 import net.sf.jasperreports.engine.JRExporter;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -44,6 +45,7 @@ public class EvaluacionController {
 
     //<editor-fold defaultstate="collapsed" desc="ATRIBUTOS">                
     private Integer procesoSeleccionado;
+    private Boolean estaPostulado;
     @ManagedProperty(value = "#{usuariosDataManager}")
     private UsuariosDataManager usuariosDataManager;
     //</editor-fold>
@@ -63,6 +65,14 @@ public class EvaluacionController {
         this.procesoSeleccionado = procesoSeleccionado;
     }
 
+    public Boolean getEstaPostulado() {
+        return estaPostulado;
+    }
+
+    public void setEstaPostulado(Boolean estaPostulado) {
+        this.estaPostulado = estaPostulado;
+    }        
+
     public UsuariosDataManager getUsuariosDataManager() {
         return usuariosDataManager;
     }
@@ -74,6 +84,7 @@ public class EvaluacionController {
 
     public String generar() {
         ProcesoModel procesoModel = new ProcesoModel();
+        ReporteModel reporteModel = new ReporteModel();
         try {
             Proceso proceso = procesoModel.encontrar(this.procesoSeleccionado);
             Date hoy = new Date();
@@ -84,19 +95,7 @@ public class EvaluacionController {
         } catch (Exception e) {
             Mensajeria.addErrorMessage("Error al verificar el estado del paquete");
             return "#";
-        }
-
-        ReporteModel reporteModel = new ReporteModel();
-        try {
-            Reporte reporte = reporteModel.encontrarPorProcesoYDocente(this.procesoSeleccionado, this.usuariosDataManager.getUsuarioSesion().getId());
-            if (reporte != null) {
-                DefaultRequestContext.getCurrentInstance().execute("dlgMensaje.show()");
-                return "#";
-            }
-        } catch (Exception e) {
-            Mensajeria.addErrorMessage("Error al validar la postulación.");
-            return "#";
-        }
+        }        
 
         TituloModel tituloModel = new TituloModel();
         List<Titulo> titulos;
@@ -143,6 +142,20 @@ public class EvaluacionController {
         } catch (Exception e) {
             Mensajeria.addErrorMessage("Error al generar el reporte.\n" + e.getMessage());
             return "#";
+        }
+    }
+    
+    public void verificaPostulacion(ValueChangeEvent event){
+        ReporteModel reporteModel = new ReporteModel();
+        this.estaPostulado = false;
+        this.procesoSeleccionado = Integer.valueOf(event.getNewValue().toString());
+        try {
+            Reporte reporte = reporteModel.encontrarPorProcesoYDocente(this.procesoSeleccionado, this.usuariosDataManager.getUsuarioSesion().getId());
+            if (reporte != null) {
+                this.estaPostulado = true;
+            }
+        } catch (Exception e) {
+            Mensajeria.addErrorMessage("Error al validar la postulación.");            
         }
     }
 

@@ -24,10 +24,19 @@ and open the template in the editor.
                             <p:ajax listener="#{resultadoController.cambiarListaResultados()}" update=":frmListado:mensajes,:frmListado:pnlDatos"/>                           
                         </p:selectOneListbox>
                     </p:panel>
-                    <p:panel id="pnlDatos" header="Resultados de paquete" style="display: inline-block; width: 58%;vertical-align: top">                                                                                                
+                    <p:panel id="pnlDatos" header="Resultados" style="display: inline-block; width: 58%;vertical-align: top">                         
                         <p:dataList value="#{resultadoController.resultados}" var="detalle" type="ordered">                            
+                            <f:facet name="header">
+                                Resultados de paquete
+                            </f:facet>
                             <b>#{detalle.valor},</b> #{detalle.reporte.docente.nombreCompleto}
-                        </p:dataList> 
+                        </p:dataList>
+                        <p:dataList value="#{resultadoController.materias}" var="materia" type="ordered">
+                            <f:facet name="header">
+                                Materias de paquete
+                            </f:facet>
+                            #{materia.nombreCarrera}, #{materia.nombreMateria}
+                        </p:dataList>
                         <f:facet name="footer">                            
                             <h:outputLink target="_blank" value="#{resultadoController.generarPorPaquete()}"
                                           rendered="#{not empty resultadoController.resultados}">Imprimir</h:outputLink>                            

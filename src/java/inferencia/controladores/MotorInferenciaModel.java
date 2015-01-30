@@ -65,7 +65,7 @@ public class MotorInferenciaModel {
                     }
                 }
 
-                resultado = Math.round(resultado * 100.0) / 100.0;
+                resultado = Math.floor(resultado * 100.0) / 100.0;                
                 Detalle detalle = new Detalle();
                 detalle.setIdMateria(materia.getId());
                 detalle.setValor(resultado);

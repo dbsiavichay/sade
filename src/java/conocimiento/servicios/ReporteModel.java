@@ -227,7 +227,7 @@ public class ReporteModel {
                 detalle.getReporte().getDocente().setNombres(dbr.getString(3));
                 detalle.getReporte().getDocente().setApellidos(dbr.getString(4));                     
 
-                detalle.setValor(dbr.getDecimal(5));
+                detalle.setValor(Math.floor(dbr.getDecimal(5)*100)/100);
                 reportes.add(detalle);
             }
             dbr.close();

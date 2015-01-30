@@ -20,7 +20,8 @@ and open the template in the editor.
                 <p:messages id="mensajes"/>                                   
                 <p:panel id="pnlListado" header="Selección de paquetes"> 
                     <p:panel header="Paquetes disponibles" style="display: inline-block; width: 38%;vertical-align: top; margin-right: 5px">
-                        <p:selectOneListbox id="lstPaquetes" value="#{procesoController.procesoActual.id}" style="height: 300px; width: 100%">
+                        <p:selectOneListbox id="lstPaquetes" value="#{procesoController.procesoActual.id}" style="height: 300px; width: 100%"
+                                            valueChangeListener="#{evaluacionController.verificaPostulacion}">
                             <p:ajax listener="#{procesoController.cambiarListaMaterias()}" update=":frmListado:mensajes,:frmListado:pnlDatosPaquete"/>
                             <f:selectItems value="#{procesoController.procesos}" var="proceso" itemLabel="#{proceso.codigo}, #{proceso.descripcion}" itemValue="#{proceso.id}" />                            
                         </p:selectOneListbox>
@@ -45,9 +46,10 @@ and open the template in the editor.
                         <f:facet name="footer">
                             <p:commandButton value="POSTULAR MI PERFIL"  id="btnGuardar" icon="ui-icon-circle-check" title="Postulación" 
                                              action="#{evaluacionController.generar()}" update=":frmListado:mensajes,:frmListado:pnlListado"
-                                             disabled="#{not (procesoController.materias.size() > 0)}">
-                                <f:setPropertyActionListener value="#{procesoController.procesoActual.id}" target="#{evaluacionController.procesoSeleccionado}"/>
-                            </p:commandButton>                             
+                                             disabled="#{not (procesoController.materias.size() > 0)}" rendered="#{not evaluacionController.estaPostulado}">                                
+                            </p:commandButton> 
+                            <p:commandButton value="VER MIS RESULTADOS" icon="ui-icon-circle-check" action="#{evaluacionController.verReporte()}"
+                                             update=":frmListado:mensajes" process="@this" rendered="#{evaluacionController.estaPostulado}" ajax="false"/>
                         </f:facet>
                     </p:panel>                    
                 </p:panel>                

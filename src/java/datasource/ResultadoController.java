@@ -6,13 +6,12 @@ package datasource;
 
 import configuracion.Mensajeria;
 import conocimiento.entidades.Detalle;
-import conocimiento.entidades.Reporte;
 import conocimiento.servicios.ReporteModel;
-import informacion.entidades.MateriaProceso;
+import informacion.entidades.Materia;
 import informacion.entidades.Proceso;
+import informacion.servicios.MateriaModel;
 import informacion.servicios.ProcesoModel;
 import java.io.File;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.util.JRLoader;
-import org.primefaces.context.DefaultRequestContext;
 
 /**
  *
@@ -38,6 +36,7 @@ public class ResultadoController {
 
     private Integer docenteSeleccionado;
     private List<Detalle> resultados;
+    private List<Materia> materias;
     private Integer procesoSeleccionado;
     private String urlReporte;
     private ReporteModel reporteModel;
@@ -82,6 +81,14 @@ public class ResultadoController {
         this.resultados = resultados;
     }
 
+    public List<Materia> getMaterias() {
+        return materias;
+    }
+
+    public void setMaterias(List<Materia> materias) {
+        this.materias = materias;
+    }        
+
     public Integer getProcesoSeleccionado() {
         return procesoSeleccionado;
     }
@@ -108,10 +115,14 @@ public class ResultadoController {
     //</editor-fold>
 
     public void cambiarListaResultados() {
+        MateriaModel materiaModel = new MateriaModel();        
+
         try {
             this.resultados = this.reporteModel.encontrarPorProcesoConPromedio(this.procesoSeleccionado);
-            if(this.resultados.isEmpty()){
+            if (this.resultados.isEmpty()) {
                 Mensajeria.addSuccessMessage("Aun no existen resultados en este paquete.");
+            }else{
+                this.materias = materiaModel.encontrarPorProceso(this.procesoSeleccionado);
             }
         } catch (Exception e) {
             Mensajeria.addErrorMessage("Error al buscar resultados de paquete.");
@@ -121,9 +132,9 @@ public class ResultadoController {
     public String generarPorPaquete() {
         ProcesoModel procesoModel = new ProcesoModel();
 
-        try {            
+        try {
             Proceso proceso = procesoModel.encontrar(this.procesoSeleccionado);
-                        
+
             PaqueteDataSource dataSource = new PaqueteDataSource(this.resultados);
             String path = FacesContext.getCurrentInstance().getExternalContext().getRealPath("/");
             String reports_path = path + "resources/reports/";
@@ -140,7 +151,7 @@ public class ResultadoController {
             String nombreReporte = proceso.getCodigo().toLowerCase() + ".pdf";
             exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
             exporter.setParameter(JRExporterParameter.OUTPUT_FILE, new File(reports_path + nombreReporte));
-            exporter.exportReport();            
+            exporter.exportReport();
             return "../resources/reports/" + nombreReporte;
         } catch (Exception e) {
             Mensajeria.addErrorMessage("Error al generar el reporte.\n" + e.getMessage());

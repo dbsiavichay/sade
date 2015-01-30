@@ -148,8 +148,8 @@ and open the template in the editor.
                         <f:facet name="footer">
                             <p:commandButton value="Guardar"  id="btnGuardar" icon="ui-icon-circle-check" 
                                              rendered="#{tituloDocenteController.nuevo and tituloDocenteController.ingresaDatos}" title="Guardar" 
-                                             action="#{tituloDocenteController.guardarTitulo()}" update=":frmDialogos:mensajes,:frmListado:pnlListado"/> 
-                            <p:commandButton value="Guardar"  id="btnActualizar" icon="ui-icon-pencil" update=":frmDialogos:mensajes,:frmListado:pnlListado"
+                                             action="#{tituloDocenteController.guardarTitulo()}" update=":frmDialogos:mensajes,:frmDialogos:pnlDatos,:frmListado:pnlListado"/> 
+                            <p:commandButton value="Guardar"  id="btnActualizar" icon="ui-icon-pencil" update=":frmDialogos:mensajes,:frmDialogos:pnlDatos,:frmListado:pnlListado"
                                              rendered="#{tituloDocenteController.editar and (tituloDocenteController.ingresaDatos)}" title="Actualizar"    
                                              action="#{tituloDocenteController.editarTitulo()}" />                                 
                             <p:commandButton value="Cerrar"  id="btnCerrar" icon="ui-icon-circle-close" update=":frmListado:mensajes,:frmListado:pnlListado"
